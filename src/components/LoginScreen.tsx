@@ -213,7 +213,7 @@ export function LoginScreen({ users, teams }: Props) {
                       {members.map(m => (
                         <button
                           key={m.id}
-                          className={`member-btn ${m.role === 'CC' ? 'is-lead' : ''}`}
+                          className={`member-btn ${['CC','SC'].includes(m.role) ? 'is-lead' : ''}`}
                           onClick={() => selectUser(m)}
                         >
                           <div className="mi">{initials(m.name)}</div>
@@ -221,7 +221,7 @@ export function LoginScreen({ users, teams }: Props) {
                             <div style={{ fontSize: '.72rem', fontWeight: 700, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.name}</div>
                             <div style={{ fontSize: '.54rem', color: 'var(--muted)', marginTop: 1 }}>{m.role}</div>
                           </div>
-                          {m.role === 'CC' && <div style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--gold)', flexShrink: 0 }} />}
+                          {['CC','SC'].includes(m.role) && <div style={{ fontSize: '.7rem' }}>👑</div>}
                         </button>
                       ))}
                     </div>

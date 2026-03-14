@@ -66,7 +66,8 @@ body {
 .team-members { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px 0 8px 8px; }
 .member-btn { background: var(--card2); border: 1px solid var(--border); border-radius: 11px; padding: 8px 10px; cursor: pointer; transition: all .2s; display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; }
 .member-btn:active { transform: scale(.97); border-color: var(--accent); }
-.member-btn.is-lead { grid-column: 1/-1; border-color: rgba(245,166,35,.25); background: rgba(245,166,35,.05); }
+.member-btn.is-lead { grid-column: 1/-1; border-color: rgba(245,166,35,.5); background: rgba(245,166,35,.09); }
+.member-btn.is-lead .mi { background: var(--gold); color: #0d1117; }
 .mi { width: 28px; height: 28px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: .8rem; color: #fff; flex-shrink: 0; }
 
 /* ── PIN SCREEN ───────────────────────────────────────────── */
