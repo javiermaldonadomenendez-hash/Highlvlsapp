@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useApp } from '@/lib/store'
 import { getEffectivePin, setCustomPin } from '@/lib/queries'
 import { initials } from '@/lib/helpers'
-import { ROLE_ORDER, LEADER_IDS } from '@/lib/data'
+import { ROLE_ORDER } from '@/lib/data'
 import type { User, Team } from '@/types'
 
 interface Props {
@@ -14,28 +14,34 @@ interface Props {
 
 export function LoginScreen({ users, teams }: Props) {
   const { login, showToast, showMascot } = useApp()
-  const [openTeam, setOpenTeam] = useState<string | null>(null)
+  const [openTeam, setOpenTeam]     = useState<string | null>(null)
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
-  const [pinBuf, setPinBuf] = useState('')
+  const [pinBuf, setPinBuf]         = useState('')
   const [pinChangeMode, setPinChangeMode] = useState(false)
-  const [pinNewBuf, setPinNewBuf] = useState('')
+  const [pinNewBuf, setPinNewBuf]   = useState('')
   const [pinNewStep, setPinNewStep] = useState(0)
+  const [pinLoading, setPinLoading] = useState(false)
   const [legalModal, setLegalModal] = useState<'impressum' | 'datenschutz' | null>(null)
+
+  // Refs to avoid stale closures in async callbacks
+  const selectedUserRef = useRef<User | null>(null)
+  const pinNewBufRef    = useRef('')
+
+  useEffect(() => { selectedUserRef.current = selectedUser }, [selectedUser])
+  useEffect(() => { pinNewBufRef.current = pinNewBuf }, [pinNewBuf])
 
   useEffect(() => {
     setTimeout(() => showMascot('lucasfreude.png', 'Willkommen bei Highlevels! 🚀 Meld dich an und leg los!', true), 1200)
   }, [showMascot])
 
   const sortedMembers = useCallback((teamKey: string) => {
-    const team = teams.find(t => t.key === teamKey)
-    if (!team) return []
-    const allUsers = users.filter(u => u.team_key === teamKey)
-    return allUsers.sort((a, b) => {
-      const ro = (ROLE_ORDER[a.role] ?? 9) - (ROLE_ORDER[b.role] ?? 9)
-      if (ro !== 0) return ro
-      return a.name.localeCompare(b.name)
-    })
-  }, [users, teams])
+    return users
+      .filter(u => u.team_key === teamKey)
+      .sort((a, b) => {
+        const ro = (ROLE_ORDER[a.role] ?? 9) - (ROLE_ORDER[b.role] ?? 9)
+        return ro !== 0 ? ro : a.name.localeCompare(b.name)
+      })
+  }, [users])
 
   function toggleTeam(key: string) {
     setOpenTeam(prev => prev === key ? null : key)
@@ -43,95 +49,131 @@ export function LoginScreen({ users, teams }: Props) {
 
   function selectUser(u: User) {
     setSelectedUser(u)
+    selectedUserRef.current = u
     setPinBuf('')
     setPinChangeMode(false)
     setPinNewBuf('')
     setPinNewStep(0)
+    setPinLoading(false)
   }
 
   function backToTeams() {
     setSelectedUser(null)
     setPinBuf('')
+    setPinChangeMode(false)
+    setPinNewBuf('')
+    setPinNewStep(0)
+    setPinLoading(false)
   }
 
-  async function tryLogin(buf: string) {
-    if (!selectedUser) return
+  async function doLogin(buf: string) {
+    const user = selectedUserRef.current
+    if (!user) return
+    setPinLoading(true)
     try {
-      const correct = await getEffectivePin(selectedUser.id)
-      if (String(buf).trim() === String(correct).trim()) {
-        login(selectedUser)
+      const correct = await getEffectivePin(user.id)
+      const match = String(buf).trim() === String(correct).trim()
+      if (match) {
+        login(user)
       } else {
         setPinBuf('')
         showToast('❌ Falscher PIN')
       }
-    } catch (e) {
+    } catch (e: any) {
       setPinBuf('')
-      showToast('❌ Verbindungsfehler – bitte nochmal')
+      showToast('❌ ' + (e?.message ?? 'Verbindungsfehler'))
       console.error('[login]', e)
+    } finally {
+      setPinLoading(false)
     }
   }
 
-  async function handlePk(n: number) {
-    if (!selectedUser) return
+  async function doSavePin(newPin: string) {
+    const user = selectedUserRef.current
+    if (!user) return
+    setPinLoading(true)
+    try {
+      await setCustomPin(user.id, newPin)
+      setPinChangeMode(false)
+      setPinNewBuf('')
+      setPinNewStep(0)
+      setPinBuf('')
+      showToast('✅ PIN gesetzt!', 'green')
+    } catch (e: any) {
+      setPinBuf('')
+      showToast('❌ ' + (e?.message ?? 'Fehler beim Speichern'))
+      console.error('[setPin]', e)
+    } finally {
+      setPinLoading(false)
+    }
+  }
 
-    // PIN change flow
+  function handlePk(n: number) {
+    if (!selectedUserRef.current || pinLoading) return
+
     if (pinChangeMode) {
       if (pinNewStep === 0) {
+        // Entering new PIN
         if (pinNewBuf.length >= 4) return
         const next = pinNewBuf + String(n)
         setPinNewBuf(next)
+        pinNewBufRef.current = next
         setPinBuf(next)
         if (next.length === 4) {
           setTimeout(() => {
             setPinNewStep(1)
             setPinBuf('')
             showToast('↔ PIN wiederholen')
-          }, 180)
+          }, 200)
         }
       } else {
+        // Confirming new PIN
         if (pinBuf.length >= 4) return
         const next = pinBuf + String(n)
         setPinBuf(next)
         if (next.length === 4) {
-          const storedNew = pinNewBuf // capture before async
-          setTimeout(async () => {
-            if (next === storedNew) {
-              try {
-                await setCustomPin(selectedUser.id, next)
-                setPinChangeMode(false)
-                setPinNewBuf('')
-                setPinNewStep(0)
-                setPinBuf('')
-                showToast('✅ PIN gesetzt!', 'green')
-              } catch {
-                setPinBuf('')
-                showToast('❌ Fehler beim Speichern')
-              }
+          const stored = pinNewBufRef.current
+          setTimeout(() => {
+            if (next === stored) {
+              doSavePin(next)
             } else {
               setPinBuf('')
               setPinNewBuf('')
+              pinNewBufRef.current = ''
               setPinNewStep(0)
               showToast('❌ PINs stimmen nicht überein')
             }
-          }, 180)
+          }, 200)
         }
       }
       return
     }
 
+    // Normal login
     if (pinBuf.length >= 4) return
     const next = pinBuf + String(n)
     setPinBuf(next)
-    if (next.length === 4) setTimeout(() => tryLogin(next), 60)
+    if (next.length === 4) {
+      setTimeout(() => doLogin(next), 80)
+    }
   }
 
   function handleDel() {
+    if (pinLoading) return
     if (pinChangeMode && pinNewStep === 0) {
-      setPinNewBuf(p => p.slice(0, -1))
+      setPinNewBuf(p => { const v = p.slice(0,-1); pinNewBufRef.current = v; return v })
       setPinBuf(p => p.slice(0, -1))
     } else {
       setPinBuf(p => p.slice(0, -1))
     }
+  }
+
+  function activatePinChange() {
+    setPinChangeMode(true)
+    setPinBuf('')
+    setPinNewBuf('')
+    pinNewBufRef.current = ''
+    setPinNewStep(0)
   }
 
   const teamColors: Record<string, string> = {
@@ -201,9 +243,10 @@ export function LoginScreen({ users, teams }: Props) {
             <div>
               <div style={{ fontSize: '.92rem', fontWeight: 700, color: 'var(--text)' }}>{selectedUser.name}</div>
               <div style={{ fontSize: '.6rem', color: 'var(--muted2)', marginTop: 2 }}>
-                {pinChangeMode
-                  ? (pinNewStep === 0 ? 'Neuen PIN eingeben' : 'PIN bestätigen')
-                  : 'Bitte PIN eingeben'}
+                {pinLoading ? '⏳ Bitte warten…'
+                  : pinChangeMode
+                    ? (pinNewStep === 0 ? '🔑 Neuen PIN eingeben' : '🔁 PIN bestätigen')
+                    : 'Bitte PIN eingeben'}
               </div>
             </div>
           </div>
@@ -216,10 +259,10 @@ export function LoginScreen({ users, teams }: Props) {
 
           <div className="pin-pad">
             {[1,2,3,4,5,6,7,8,9].map(n => (
-              <button key={n} className="pk-btn" onClick={() => handlePk(n)}>{n}</button>
+              <button key={n} className="pk-btn" onClick={() => handlePk(n)} disabled={pinLoading}>{n}</button>
             ))}
-            <button className="pk-btn" style={{ fontSize: '1.2rem' }} onClick={() => setPinChangeMode(true)}>🔑</button>
-            <button className="pk-btn" onClick={() => handlePk(0)}>0</button>
+            <button className="pk-btn" style={{ fontSize: '1.2rem' }} onClick={activatePinChange}>🔑</button>
+            <button className="pk-btn" onClick={() => handlePk(0)} disabled={pinLoading}>0</button>
             <button className="pk-btn" style={{ fontSize: '1.2rem' }} onClick={handleDel}>⌫</button>
           </div>
 
