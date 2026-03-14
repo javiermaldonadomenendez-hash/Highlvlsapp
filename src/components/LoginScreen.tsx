@@ -135,7 +135,7 @@ export function LoginScreen({ users, teams }: Props) {
 
   return (
     <div className="screen active" id="loginScreen">
-      <img src="/logo.png" alt="Highlevels" className="app-logo" />
+      <p className="logo">High<span>levels</span></p>
 
       {!selectedUser ? (
         <>
