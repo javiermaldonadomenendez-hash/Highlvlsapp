@@ -1,0 +1,122 @@
+'use client'
+
+import { useEffect, useState, useCallback } from 'react'
+import { useApp } from '@/lib/store'
+import { initials, nextFriday } from '@/lib/helpers'
+import { LEADER_IDS } from '@/lib/data'
+import { QuestsTab } from './tabs/QuestsTab'
+import { KpiTab } from './tabs/KpiTab'
+import { RankingTab } from './tabs/RankingTab'
+import { ContactsTab } from './tabs/ContactsTab'
+import { PinboardTab } from './tabs/PinboardTab'
+import { LeaderTab } from './tabs/LeaderTab'
+import { NotifPrompt } from './NotifPrompt'
+import type { Team } from '@/types'
+
+interface Props {
+  teams: Team[]
+}
+
+export function AppShell({ teams }: Props) {
+  const { state, logout, setTab, showMascot } = useApp()
+  const { user, currentTab } = state
+  const [dlText, setDlText] = useState('–')
+  const [dlUrgent, setDlUrgent] = useState(false)
+  const [dlPct, setDlPct] = useState(100)
+
+  const isLeader = user ? LEADER_IDS.includes(user.id) : false
+
+  // Deadline timer
+  useEffect(() => {
+    function update() {
+      const now = new Date()
+      const dl = nextFriday()
+      const diff = dl.getTime() - now.getTime()
+      if (diff < 0) { setDlText('Vorbei!'); setDlUrgent(true); return }
+      const d = Math.floor(diff / 86400000)
+      const h = Math.floor((diff % 86400000) / 3600000)
+      const m = Math.floor((diff % 3600000) / 60000)
+      setDlText(`FR 15:00 · ${d ? d + 'T ' : ''}${h}H ${m}M`)
+      setDlUrgent(diff < 7200000)
+      setDlPct(Math.max(0, Math.min(100, (1 - diff / (7 * 86400000)) * 100)))
+    }
+    update()
+    const t = setInterval(update, 1000)
+    return () => clearInterval(t)
+  }, [])
+
+  // Badge
+  useEffect(() => {
+    if ('setAppBadge' in navigator) {
+      navigator.clearAppBadge?.().catch(() => {})
+    }
+  }, [currentTab])
+
+  // Mascot on quests tab
+  useEffect(() => {
+    if (currentTab === 'quests') {
+      setTimeout(() => showMascot('lucasfreude.png', 'Los geht\'s! 💪 Erledige deine Quests für heute.', false), 300)
+    }
+  }, [currentTab, showMascot])
+
+  function handleLogout() {
+    if (confirm('Abmelden?')) logout()
+  }
+
+  const tabs = [
+    { id: 'quests',   icon: '⚔️',  label: 'Quests' },
+    { id: 'kpi',      icon: '🎯',  label: 'KPIs' },
+    { id: 'ranking',  icon: '🏆',  label: 'Ranking' },
+    { id: 'contacts', icon: '👥',  label: 'Kontakte' },
+    { id: 'pinboard', icon: '📌',  label: 'Board' },
+    ...(isLeader ? [{ id: 'leader', icon: '👑', label: 'Team' }] : []),
+  ] as const
+
+  if (!user) return null
+
+  return (
+    <div className="screen active" id="appScreen">
+      <div className="app-header">
+        <div className="hl-logo">High<span>levels</span></div>
+        <div className="user-chip" onClick={handleLogout}>
+          <span style={{ fontSize: '.76rem', fontWeight: 600, color: 'var(--muted2)' }}>{user.name}</span>
+          <div className="user-av">{initials(user.name)}</div>
+        </div>
+      </div>
+
+      <div className="dl-strip">
+        <div className="dl-inner">
+          <span className="dl-label">⏰ Deadline</span>
+          <span className={`dl-time ${dlUrgent ? 'urgent' : ''}`}>{dlText}</span>
+          <div className="dl-bar-wrap">
+            <div className="dl-bar-fill" style={{ width: `${dlPct}%` }} />
+          </div>
+        </div>
+      </div>
+
+      <div className="content-area" id="content">
+        {currentTab === 'quests'   && <QuestsTab />}
+        {currentTab === 'kpi'      && <KpiTab teams={teams} />}
+        {currentTab === 'ranking'  && <RankingTab teams={teams} />}
+        {currentTab === 'contacts' && <ContactsTab />}
+        {currentTab === 'pinboard' && <PinboardTab />}
+        {currentTab === 'leader'   && isLeader && <LeaderTab teams={teams} />}
+      </div>
+
+      <div className="bottom-nav">
+        {tabs.map(t => (
+          <button
+            key={t.id}
+            className={`nbtn ${currentTab === t.id ? 'active' : ''}`}
+            onClick={() => setTab(t.id as any)}
+          >
+            <span className="ni">{t.icon}</span>
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      <NotifPrompt />
+    </div>
+  )
+}

@@ -1,0 +1,644 @@
+{
+  "node": {
+    "401dcc9add7500963d41caf701c73dbc5581852670": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 65573,
+          "async": false,
+          "exportedName": "getEffectivePin",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        },
+        "app/page": {
+          "moduleId": 17703,
+          "async": false,
+          "exportedName": "getEffectivePin",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        }
+      },
+      "layer": {
+        "app/admin/page": "rsc",
+        "app/page": "rsc"
+      },
+      "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts",
+      "exportedName": "getEffectivePin"
+    },
+    "60638f25e269f95f98e6e436ecf8b68daa721e1527": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 65573,
+          "async": false,
+          "exportedName": "setCustomPin",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        },
+        "app/page": {
+          "moduleId": 17703,
+          "async": false,
+          "exportedName": "setCustomPin",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        }
+      },
+      "layer": {
+        "app/admin/page": "rsc",
+        "app/page": "rsc"
+      },
+      "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts",
+      "exportedName": "setCustomPin"
+    },
+    "40b862687cd8496b87cb50a2f4534c826306197d13": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 65573,
+          "async": false,
+          "exportedName": "getQuestCompletions",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        },
+        "app/page": {
+          "moduleId": 17703,
+          "async": false,
+          "exportedName": "getQuestCompletions",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        }
+      },
+      "layer": {
+        "app/admin/page": "rsc",
+        "app/page": "rsc"
+      },
+      "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts",
+      "exportedName": "getQuestCompletions"
+    },
+    "785644e99cacd842469899b824bee1e5ab5d2532fc": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 65573,
+          "async": false,
+          "exportedName": "toggleQuest",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        },
+        "app/page": {
+          "moduleId": 17703,
+          "async": false,
+          "exportedName": "toggleQuest",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        }
+      },
+      "layer": {
+        "app/admin/page": "rsc",
+        "app/page": "rsc"
+      },
+      "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts",
+      "exportedName": "toggleQuest"
+    },
+    "40793d7022c6b9b9eb673451fbc82bd8deaa1f71aa": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 65573,
+          "async": false,
+          "exportedName": "getMassnahmen",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        },
+        "app/page": {
+          "moduleId": 17703,
+          "async": false,
+          "exportedName": "getMassnahmen",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        }
+      },
+      "layer": {
+        "app/admin/page": "rsc",
+        "app/page": "rsc"
+      },
+      "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts",
+      "exportedName": "getMassnahmen"
+    },
+    "787cf2f1e2183616f360a0a8643fd8342df25b0fb3": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 65573,
+          "async": false,
+          "exportedName": "saveMassnahme",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        },
+        "app/page": {
+          "moduleId": 17703,
+          "async": false,
+          "exportedName": "saveMassnahme",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        }
+      },
+      "layer": {
+        "app/admin/page": "rsc",
+        "app/page": "rsc"
+      },
+      "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts",
+      "exportedName": "saveMassnahme"
+    },
+    "4007ae96aceca2ef3110075a287b8049ea7fa09d67": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 65573,
+          "async": false,
+          "exportedName": "getUserXp",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        },
+        "app/page": {
+          "moduleId": 17703,
+          "async": false,
+          "exportedName": "getUserXp",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        }
+      },
+      "layer": {
+        "app/admin/page": "rsc",
+        "app/page": "rsc"
+      },
+      "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts",
+      "exportedName": "getUserXp"
+    },
+    "40bbc3b0dbd528c4b145c34fe33ca7a098b9bbc767": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 65573,
+          "async": false,
+          "exportedName": "updateStreak",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        },
+        "app/page": {
+          "moduleId": 17703,
+          "async": false,
+          "exportedName": "updateStreak",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        }
+      },
+      "layer": {
+        "app/admin/page": "rsc",
+        "app/page": "rsc"
+      },
+      "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts",
+      "exportedName": "updateStreak"
+    },
+    "40439abea43ad57394a6de3b2609ee24e8952c0d08": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 65573,
+          "async": false,
+          "exportedName": "getKpiEntries",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        },
+        "app/page": {
+          "moduleId": 17703,
+          "async": false,
+          "exportedName": "getKpiEntries",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        }
+      },
+      "layer": {
+        "app/admin/page": "rsc",
+        "app/page": "rsc"
+      },
+      "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts",
+      "exportedName": "getKpiEntries"
+    },
+    "7885df1e40f23c1d3ddd60c3f7fb9edaf6dd68c303": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 65573,
+          "async": false,
+          "exportedName": "saveKpiEntry",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        },
+        "app/page": {
+          "moduleId": 17703,
+          "async": false,
+          "exportedName": "saveKpiEntry",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        }
+      },
+      "layer": {
+        "app/admin/page": "rsc",
+        "app/page": "rsc"
+      },
+      "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts",
+      "exportedName": "saveKpiEntry"
+    },
+    "40963be9a5e68633e04f3e29d3788cae3fab03c176": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 65573,
+          "async": false,
+          "exportedName": "getBwsEntry",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        },
+        "app/page": {
+          "moduleId": 17703,
+          "async": false,
+          "exportedName": "getBwsEntry",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        }
+      },
+      "layer": {
+        "app/admin/page": "rsc",
+        "app/page": "rsc"
+      },
+      "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts",
+      "exportedName": "getBwsEntry"
+    },
+    "70bf4924d709507f98bdea9999417e3981e6ce6fdf": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 65573,
+          "async": false,
+          "exportedName": "saveBwsEntry",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        },
+        "app/page": {
+          "moduleId": 17703,
+          "async": false,
+          "exportedName": "saveBwsEntry",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        }
+      },
+      "layer": {
+        "app/admin/page": "rsc",
+        "app/page": "rsc"
+      },
+      "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts",
+      "exportedName": "saveBwsEntry"
+    },
+    "004951e17be14b459994335d65e3cc87b33edf1524": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 65573,
+          "async": false,
+          "exportedName": "getAllKpiEntriesThisWeek",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        },
+        "app/page": {
+          "moduleId": 17703,
+          "async": false,
+          "exportedName": "getAllKpiEntriesThisWeek",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        }
+      },
+      "layer": {
+        "app/admin/page": "rsc",
+        "app/page": "rsc"
+      },
+      "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts",
+      "exportedName": "getAllKpiEntriesThisWeek"
+    },
+    "0089bf306ba6d6b6ba828ca2c8a4feb211d19a22bb": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 65573,
+          "async": false,
+          "exportedName": "getAllBwsEntriesThisMonth",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        },
+        "app/page": {
+          "moduleId": 17703,
+          "async": false,
+          "exportedName": "getAllBwsEntriesThisMonth",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        }
+      },
+      "layer": {
+        "app/admin/page": "rsc",
+        "app/page": "rsc"
+      },
+      "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts",
+      "exportedName": "getAllBwsEntriesThisMonth"
+    },
+    "005c9368519e5a6b07ddc77c9b465c71cf5dccb3c4": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 65573,
+          "async": false,
+          "exportedName": "getUsers",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        },
+        "app/page": {
+          "moduleId": 17703,
+          "async": false,
+          "exportedName": "getUsers",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        }
+      },
+      "layer": {
+        "app/admin/page": "rsc",
+        "app/page": "rsc"
+      },
+      "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts",
+      "exportedName": "getUsers"
+    },
+    "401b12ba04a53d7d9aac3205082d85282e8c559596": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 65573,
+          "async": false,
+          "exportedName": "getContacts",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        },
+        "app/page": {
+          "moduleId": 17703,
+          "async": false,
+          "exportedName": "getContacts",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        }
+      },
+      "layer": {
+        "app/admin/page": "rsc",
+        "app/page": "rsc"
+      },
+      "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts",
+      "exportedName": "getContacts"
+    },
+    "409073685264e2dd503f95ed98f411e24ecd70413e": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 65573,
+          "async": false,
+          "exportedName": "saveContact",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        },
+        "app/page": {
+          "moduleId": 17703,
+          "async": false,
+          "exportedName": "saveContact",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        }
+      },
+      "layer": {
+        "app/admin/page": "rsc",
+        "app/page": "rsc"
+      },
+      "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts",
+      "exportedName": "saveContact"
+    },
+    "605cb68ea4f09e409071e6624e305d5f8587d1f1f3": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 65573,
+          "async": false,
+          "exportedName": "updateContact",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        },
+        "app/page": {
+          "moduleId": 17703,
+          "async": false,
+          "exportedName": "updateContact",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        }
+      },
+      "layer": {
+        "app/admin/page": "rsc",
+        "app/page": "rsc"
+      },
+      "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts",
+      "exportedName": "updateContact"
+    },
+    "408580206672166117b13b597926ccbabe65eb921f": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 65573,
+          "async": false,
+          "exportedName": "deleteContact",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        },
+        "app/page": {
+          "moduleId": 17703,
+          "async": false,
+          "exportedName": "deleteContact",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        }
+      },
+      "layer": {
+        "app/admin/page": "rsc",
+        "app/page": "rsc"
+      },
+      "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts",
+      "exportedName": "deleteContact"
+    },
+    "4005747f5bce1d55fbec4e38df710bd6de3f0b0af0": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 65573,
+          "async": false,
+          "exportedName": "getPinboard",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        },
+        "app/page": {
+          "moduleId": 17703,
+          "async": false,
+          "exportedName": "getPinboard",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        }
+      },
+      "layer": {
+        "app/admin/page": "rsc",
+        "app/page": "rsc"
+      },
+      "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts",
+      "exportedName": "getPinboard"
+    },
+    "600e09dae959a4d746d684f3beac44b9454a377d11": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 65573,
+          "async": false,
+          "exportedName": "savePinboard",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        },
+        "app/page": {
+          "moduleId": 17703,
+          "async": false,
+          "exportedName": "savePinboard",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        }
+      },
+      "layer": {
+        "app/admin/page": "rsc",
+        "app/page": "rsc"
+      },
+      "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts",
+      "exportedName": "savePinboard"
+    },
+    "407d0099d7b68574375241b6c26787bf8bb1656a82": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 65573,
+          "async": false,
+          "exportedName": "getUsersByTeam",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        },
+        "app/page": {
+          "moduleId": 17703,
+          "async": false,
+          "exportedName": "getUsersByTeam",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        }
+      },
+      "layer": {
+        "app/admin/page": "rsc",
+        "app/page": "rsc"
+      },
+      "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts",
+      "exportedName": "getUsersByTeam"
+    },
+    "0028ad50f23d19d5611ecf7dc3ae8f47fa8d1679c5": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 65573,
+          "async": false,
+          "exportedName": "getTeams",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        },
+        "app/page": {
+          "moduleId": 17703,
+          "async": false,
+          "exportedName": "getTeams",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        }
+      },
+      "layer": {
+        "app/admin/page": "rsc",
+        "app/page": "rsc"
+      },
+      "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts",
+      "exportedName": "getTeams"
+    },
+    "00b5650d58d895d10718b8ead9c672aff83943a1db": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 65573,
+          "async": false,
+          "exportedName": "getAllPushSubscriptions",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        },
+        "app/page": {
+          "moduleId": 17703,
+          "async": false,
+          "exportedName": "getAllPushSubscriptions",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        }
+      },
+      "layer": {
+        "app/admin/page": "rsc",
+        "app/page": "rsc"
+      },
+      "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts",
+      "exportedName": "getAllPushSubscriptions"
+    },
+    "400511f72f4bb897f3f64c01376263b3528f6a2176": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 65573,
+          "async": false,
+          "exportedName": "createUser",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        },
+        "app/page": {
+          "moduleId": 17703,
+          "async": false,
+          "exportedName": "createUser",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        }
+      },
+      "layer": {
+        "app/admin/page": "rsc",
+        "app/page": "rsc"
+      },
+      "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts",
+      "exportedName": "createUser"
+    },
+    "407366577e1fed4ae9fc69455aeaf6e9ce79c7ecd8": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 65573,
+          "async": false,
+          "exportedName": "deletePushSubscription",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        },
+        "app/page": {
+          "moduleId": 17703,
+          "async": false,
+          "exportedName": "deletePushSubscription",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        }
+      },
+      "layer": {
+        "app/admin/page": "rsc",
+        "app/page": "rsc"
+      },
+      "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts",
+      "exportedName": "deletePushSubscription"
+    },
+    "408f1d94707d6218e1db5eb8522abaca5c3ccf3089": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 65573,
+          "async": false,
+          "exportedName": "getUserById",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        },
+        "app/page": {
+          "moduleId": 17703,
+          "async": false,
+          "exportedName": "getUserById",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        }
+      },
+      "layer": {
+        "app/admin/page": "rsc",
+        "app/page": "rsc"
+      },
+      "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts",
+      "exportedName": "getUserById"
+    },
+    "40a27421553a455897c01d77c2bc1709dd8ab54fbc": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 65573,
+          "async": false,
+          "exportedName": "deactivateUser",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        },
+        "app/page": {
+          "moduleId": 17703,
+          "async": false,
+          "exportedName": "deactivateUser",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        }
+      },
+      "layer": {
+        "app/admin/page": "rsc",
+        "app/page": "rsc"
+      },
+      "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts",
+      "exportedName": "deactivateUser"
+    },
+    "604a8fd6e40dcfb5c36cac5e20b9e98c4ee2c91454": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 65573,
+          "async": false,
+          "exportedName": "savePushSubscription",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        },
+        "app/page": {
+          "moduleId": 17703,
+          "async": false,
+          "exportedName": "savePushSubscription",
+          "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts"
+        }
+      },
+      "layer": {
+        "app/admin/page": "rsc",
+        "app/page": "rsc"
+      },
+      "filename": "Desktop/projekte webmoderno/highlevels-next/src/lib/queries.ts",
+      "exportedName": "savePushSubscription"
+    }
+  },
+  "edge": {},
+  "encryptionKey": "4l2G/YyTGYaJqok8A6C81k6Jor4kzqnBPm11e3olMMA="
+}
