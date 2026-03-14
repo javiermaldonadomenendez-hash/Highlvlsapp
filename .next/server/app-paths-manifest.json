@@ -1,8 +1,0 @@
-{
-  "/_global-error/page": "app/_global-error/page.js",
-  "/_not-found/page": "app/_not-found/page.js",
-  "/admin/page": "app/admin/page.js",
-  "/api/cron-push/route": "app/api/cron-push/route.js",
-  "/api/push/route": "app/api/push/route.js",
-  "/page": "app/page.js"
-}

@@ -1,5 +1,0 @@
-1:"$Sreact.fragment"
-2:I[64539,["/_next/static/chunks/ea125691af0d1473.js"],"ViewportBoundary"]
-3:I[64539,["/_next/static/chunks/ea125691af0d1473.js"],"MetadataBoundary"]
-4:"$Sreact.suspense"
-0:{"buildId":"96Dwd8bBCuCzgdAl0ewuI","rsc":["$","$1","h",{"children":[["$","meta",null,{"name":"robots","content":"noindex"}],["$","$L2",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1, viewport-fit=cover"}],["$","meta","2",{"name":"theme-color","content":"#0d1117"}]]}],["$","div",null,{"hidden":true,"children":["$","$L3",null,{"children":["$","$4",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"Highlevels"}],["$","meta","1",{"name":"description","content":"Sales Gamification App"}],["$","link","2",{"rel":"manifest","href":"/manifest.json"}],["$","meta","3",{"name":"mobile-web-app-capable","content":"yes"}],["$","meta","4",{"name":"apple-mobile-web-app-title","content":"Highlevels"}],["$","meta","5",{"name":"apple-mobile-web-app-status-bar-style","content":"black-translucent"}]]}]}]}],null]}],"loading":null,"isPartial":false}

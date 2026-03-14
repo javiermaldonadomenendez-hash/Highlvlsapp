@@ -56,12 +56,18 @@ export function LoginScreen({ users, teams }: Props) {
 
   async function tryLogin(buf: string) {
     if (!selectedUser) return
-    const correct = await getEffectivePin(selectedUser.id)
-    if (buf === correct) {
-      login(selectedUser)
-    } else {
+    try {
+      const correct = await getEffectivePin(selectedUser.id)
+      if (String(buf).trim() === String(correct).trim()) {
+        login(selectedUser)
+      } else {
+        setPinBuf('')
+        showToast('❌ Falscher PIN')
+      }
+    } catch (e) {
       setPinBuf('')
-      showToast('❌ Falscher PIN')
+      showToast('❌ Verbindungsfehler – bitte nochmal')
+      console.error('[login]', e)
     }
   }
 
@@ -129,7 +135,7 @@ export function LoginScreen({ users, teams }: Props) {
 
   return (
     <div className="screen active" id="loginScreen">
-      <p className="logo">High<span>levels</span></p>
+      <img src="/logo.png" alt="Highlevels" className="app-logo" />
 
       {!selectedUser ? (
         <>

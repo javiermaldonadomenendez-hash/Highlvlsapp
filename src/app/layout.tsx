@@ -28,7 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
-        <link rel="apple-touch-icon" href="/emoji/lucasfreude.png" />
+        <link rel="apple-touch-icon" href="/logo.png" />
       </head>
       <body>{children}</body>
     </html>
