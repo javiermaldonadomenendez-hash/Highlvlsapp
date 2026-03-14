@@ -31,7 +31,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="apple-touch-icon" sizes="180x180" href="/logo.png?v=2" />
         <link rel="apple-touch-icon" href="/logo.png?v=2" />
       </head>
-      <body>{children}</body>
+      <body>
+        <div style={{ width: '100%', maxWidth: 430, display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
+          {children}
+        </div>
+      </body>
     </html>
   )
 }
