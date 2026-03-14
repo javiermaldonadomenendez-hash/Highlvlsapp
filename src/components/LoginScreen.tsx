@@ -76,44 +76,49 @@ export function LoginScreen({ users, teams }: Props) {
 
     // PIN change flow
     if (pinChangeMode) {
-      if (n === -1) { // confirm
-        if (pinNewStep === 0 && pinNewBuf.length === 4) {
-          setPinNewStep(1)
-          setPinBuf('')
-          showToast('↔ PIN wiederholen')
-        } else if (pinNewStep === 1 && pinBuf.length === 4) {
-          if (pinBuf === pinNewBuf) {
-            await setCustomPin(selectedUser.id, pinBuf)
-            setPinChangeMode(false)
-            setPinNewBuf('')
-            setPinNewStep(0)
-            setPinBuf('')
-            showToast('✅ PIN gesetzt!', 'green')
-          } else {
-            setPinBuf('')
-            setPinNewBuf('')
-            setPinNewStep(0)
-            showToast('❌ PINs stimmen nicht überein')
-          }
-        }
-        return
-      }
       if (pinNewStep === 0) {
         if (pinNewBuf.length >= 4) return
         const next = pinNewBuf + String(n)
         setPinNewBuf(next)
         setPinBuf(next)
-        if (next.length === 4) setTimeout(() => handlePk(-1), 120)
+        if (next.length === 4) {
+          setTimeout(() => {
+            setPinNewStep(1)
+            setPinBuf('')
+            showToast('↔ PIN wiederholen')
+          }, 180)
+        }
       } else {
         if (pinBuf.length >= 4) return
         const next = pinBuf + String(n)
         setPinBuf(next)
-        if (next.length === 4) setTimeout(() => handlePk(-1), 120)
+        if (next.length === 4) {
+          const storedNew = pinNewBuf // capture before async
+          setTimeout(async () => {
+            if (next === storedNew) {
+              try {
+                await setCustomPin(selectedUser.id, next)
+                setPinChangeMode(false)
+                setPinNewBuf('')
+                setPinNewStep(0)
+                setPinBuf('')
+                showToast('✅ PIN gesetzt!', 'green')
+              } catch {
+                setPinBuf('')
+                showToast('❌ Fehler beim Speichern')
+              }
+            } else {
+              setPinBuf('')
+              setPinNewBuf('')
+              setPinNewStep(0)
+              showToast('❌ PINs stimmen nicht überein')
+            }
+          }, 180)
+        }
       }
       return
     }
 
-    if (n === -1) { tryLogin(pinBuf); return }
     if (pinBuf.length >= 4) return
     const next = pinBuf + String(n)
     setPinBuf(next)
