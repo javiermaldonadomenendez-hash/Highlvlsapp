@@ -25,13 +25,14 @@ export function LeaderTab({ teams }: Props) {
 
   const load = useCallback(async () => {
     setLoading(true)
-    const teamUsers = await getUsersByTeam(user.team_key)
+    const [teamUsers, kpiData] = await Promise.all([
+      getUsersByTeam(user.team_key),
+      getAllKpiEntriesThisWeek(),
+    ])
     const sorted = [...teamUsers].sort((a, b) => {
       const ro = (ROLE_ORDER[a.role] ?? 9) - (ROLE_ORDER[b.role] ?? 9)
       return ro !== 0 ? ro : a.name.localeCompare(b.name)
     })
-
-    const kpiData = await getAllKpiEntriesThisWeek()
 
     const stats = await Promise.all(sorted.map(async m => {
       const [comps, xpData, bws] = await Promise.all([

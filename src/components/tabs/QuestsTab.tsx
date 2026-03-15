@@ -37,6 +37,13 @@ export function QuestsTab() {
   const isDone = (qid: string) => completions.some(c => c.quest_id === qid)
   const doneCnt = QUESTS.filter(q => isDone(q.id)).length
   const pct = Math.round((doneCnt / QUESTS.length) * 100)
+
+  // Reactive Lucas mascot based on time + quest status
+  const lucasImg = (() => {
+    if (doneCnt === QUESTS.length) return 'lucasfreude.png'
+    const h = new Date().getHours()
+    return h >= 18 ? 'lucastraurig.png' : 'lucassauer.png'
+  })()
   const lvl = Math.floor(xp / 500) + 1
   const xpPct = Math.min((xp % 500) / 5, 100)
   const today = new Date().toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })
@@ -145,6 +152,13 @@ export function QuestsTab() {
       </div>
 
       <div className="xp-row">
+        <img
+          src={`/emoji/${lucasImg}`}
+          alt="Lucas"
+          width={40}
+          height={40}
+          style={{ borderRadius: '50%', flexShrink: 0, objectFit: 'cover', transition: 'opacity .4s' }}
+        />
         <div className="xp-label">⚡ Level {lvl} · {xp} XP</div>
         <div className="xp-bar-wrap"><div className="xp-bar-fill" style={{ width:`${xpPct}%` }} /></div>
         <div className="xp-val">{xp % 500} / 500</div>

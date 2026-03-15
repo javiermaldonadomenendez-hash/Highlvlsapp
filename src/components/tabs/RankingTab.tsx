@@ -24,12 +24,15 @@ export function RankingTab({ teams }: Props) {
 
   const load = useCallback(async () => {
     setLoading(true)
-    const users = await getUsers()
+    const [users, kpiData, bwsData] = await Promise.all([
+      getUsers(),
+      getAllKpiEntriesThisWeek(),
+      getAllBwsEntriesThisMonth(),
+    ])
 
     let entries: RankEntry[] = []
 
     if (period === 'weekly') {
-      const kpiData = await getAllKpiEntriesThisWeek()
       entries = users.map(u => {
         const uEntries = kpiData.filter(e => e.user_id === u.id).map(e => ({
           kpi_id: e.kpi_id, week_key: '', values: e.values ?? [], slider_value: e.slider_value
@@ -38,7 +41,6 @@ export function RankingTab({ teams }: Props) {
         return { user: u, score, label: 'Pts' }
       })
     } else {
-      const bwsData = await getAllBwsEntriesThisMonth()
       entries = users.map(u => {
         const bws = bwsData.find(e => e.user_id === u.id)
         return { user: u, score: bws?.value ?? 0, label: '€ BWS' }

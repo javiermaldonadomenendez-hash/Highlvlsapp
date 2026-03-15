@@ -12,19 +12,21 @@ function db() { return supabaseAdmin() }
 
 // ── USERS ─────────────────────────────────────────────────────
 export async function getUsers(): Promise<User[]> {
-  const { data, error } = await db().from('users').select('*').eq('active', true).order('id')
+  const { data, error } = await db()
+    .from('users').select('id,name,role,team_key,pin,is_leader,active').eq('active', true).order('id')
   if (error) throw error
   return data as User[]
 }
 
 export async function getUserById(id: number): Promise<User | null> {
-  const { data } = await db().from('users').select('*').eq('id', id).single()
+  const { data } = await db()
+    .from('users').select('id,name,role,team_key,pin,is_leader,active').eq('id', id).single()
   return data as User | null
 }
 
 export async function getUsersByTeam(teamKey: string): Promise<User[]> {
   const { data, error } = await db()
-    .from('users').select('*').eq('team_key', teamKey).eq('active', true).order('id')
+    .from('users').select('id,name,role,team_key,pin,is_leader,active').eq('team_key', teamKey).eq('active', true).order('id')
   if (error) throw error
   return data as User[]
 }
@@ -42,7 +44,7 @@ export async function setCustomPin(userId: number, pin: string): Promise<void> {
 
 // ── TEAMS ─────────────────────────────────────────────────────
 export async function getTeams(): Promise<Team[]> {
-  const { data, error } = await db().from('teams').select('*')
+  const { data, error } = await db().from('teams').select('key,name,bws_max,bws_challenges,bws_marks')
   if (error) throw error
   return data as Team[]
 }
@@ -73,7 +75,7 @@ export async function toggleQuest(userId: number, questId: string, done: boolean
 // ── MASSNAHMEN ────────────────────────────────────────────────
 export async function getMassnahmen(userId: number): Promise<Massnahme[]> {
   const { data, error } = await db()
-    .from('massnahmen').select('*').eq('user_id', userId).eq('day_key', dayKey())
+    .from('massnahmen').select('id,user_id,type,day_key,person,item1,item2,item3').eq('user_id', userId).eq('day_key', dayKey())
   if (error) throw error
   return (data ?? []) as Massnahme[]
 }
@@ -158,7 +160,8 @@ export async function getAllBwsEntriesThisMonth(): Promise<{ user_id: number; va
 
 // ── XP / STREAK ───────────────────────────────────────────────
 export async function getUserXp(userId: number): Promise<UserXp> {
-  const { data } = await db().from('user_xp').select('*').eq('user_id', userId).single()
+  const { data } = await db()
+    .from('user_xp').select('user_id,xp,streak_count,streak_last_day').eq('user_id', userId).single()
   return data ?? { user_id: userId, xp: 0, streak_count: 0, streak_last_day: '' }
 }
 
@@ -179,7 +182,8 @@ export async function updateStreak(userId: number): Promise<void> {
 
 // ── CONTACTS ──────────────────────────────────────────────────
 export async function getContacts(userId: number): Promise<Contact[]> {
-  const { data, error } = await db().from('contacts').select('*').eq('user_id', userId).order('created_at')
+  const { data, error } = await db()
+    .from('contacts').select('id,user_id,first_name,last_name,phone,birthday,bedarf,type,emoji,created_at').eq('user_id', userId).order('created_at')
   if (error) throw error
   return (data ?? []) as Contact[]
 }

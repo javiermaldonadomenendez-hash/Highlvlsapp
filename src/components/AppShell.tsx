@@ -1,17 +1,33 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
+import dynamic from 'next/dynamic'
 import { useApp } from '@/lib/store'
 import { initials, nextFriday } from '@/lib/helpers'
 import { LEADER_IDS } from '@/lib/data'
-import { QuestsTab } from './tabs/QuestsTab'
-import { KpiTab } from './tabs/KpiTab'
-import { RankingTab } from './tabs/RankingTab'
-import { ContactsTab } from './tabs/ContactsTab'
-import { PinboardTab } from './tabs/PinboardTab'
-import { LeaderTab } from './tabs/LeaderTab'
 import { NotifPrompt } from './NotifPrompt'
 import type { Team } from '@/types'
+
+// ── Skeleton ──────────────────────────────────────────────────
+function TabSkeleton() {
+  return (
+    <div style={{ padding: '8px 0' }}>
+      <div className="sk-bar" style={{ height: 72, borderRadius: 16, marginBottom: 9 }} />
+      <div className="sk-bar" style={{ height: 36, borderRadius: 10, marginBottom: 9 }} />
+      {[0, 1, 2, 3].map(i => (
+        <div key={i} className="sk-bar" style={{ height: 68, borderRadius: 15, marginBottom: 6, animationDelay: `${i * 0.08}s` }} />
+      ))}
+    </div>
+  )
+}
+
+// ── Dynamic Tab Imports ───────────────────────────────────────
+const QuestsTab   = dynamic(() => import('./tabs/QuestsTab').then(m => ({ default: m.QuestsTab })),     { loading: () => <TabSkeleton />, ssr: false })
+const KpiTab      = dynamic(() => import('./tabs/KpiTab').then(m => ({ default: m.KpiTab })),           { loading: () => <TabSkeleton />, ssr: false })
+const RankingTab  = dynamic(() => import('./tabs/RankingTab').then(m => ({ default: m.RankingTab })),   { loading: () => <TabSkeleton />, ssr: false })
+const ContactsTab = dynamic(() => import('./tabs/ContactsTab').then(m => ({ default: m.ContactsTab })), { loading: () => <TabSkeleton />, ssr: false })
+const PinboardTab = dynamic(() => import('./tabs/PinboardTab').then(m => ({ default: m.PinboardTab })), { loading: () => <TabSkeleton />, ssr: false })
+const LeaderTab   = dynamic(() => import('./tabs/LeaderTab').then(m => ({ default: m.LeaderTab })),     { loading: () => <TabSkeleton />, ssr: false })
 
 interface Props {
   teams: Team[]

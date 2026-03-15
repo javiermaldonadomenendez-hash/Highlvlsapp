@@ -1,7 +1,30 @@
 'use client'
 
-import { createContext, useContext, useReducer, useCallback, type ReactNode } from 'react'
+import { createContext, useContext, useReducer, useCallback, useEffect, type ReactNode } from 'react'
 import type { User, Tab } from '@/types'
+
+const SESSION_KEY = 'hl_session'
+const SESSION_TTL = 5 * 60 * 1000 // 5 minutes
+
+function saveSession(user: User) {
+  try {
+    localStorage.setItem(SESSION_KEY, JSON.stringify({ user, ts: Date.now() }))
+  } catch {}
+}
+
+function loadSession(): User | null {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY)
+    if (!raw) return null
+    const { user, ts } = JSON.parse(raw)
+    if (Date.now() - ts > SESSION_TTL) return null
+    return user as User
+  } catch { return null }
+}
+
+function clearSession() {
+  try { localStorage.removeItem(SESSION_KEY) } catch {}
+}
 
 // ── State ────────────────────────────────────────────────────
 interface AppState {
@@ -10,6 +33,7 @@ interface AppState {
   toast: { msg: string; color?: string } | null
   xpPop: string | null
   mascot: { img: string; msg: string; bounce: boolean } | null
+  hydrated: boolean
 }
 
 const initialState: AppState = {
@@ -18,6 +42,7 @@ const initialState: AppState = {
   toast: null,
   xpPop: null,
   mascot: null,
+  hydrated: false,
 }
 
 // ── Actions ──────────────────────────────────────────────────
@@ -31,11 +56,12 @@ type Action =
   | { type: 'CLEAR_XP' }
   | { type: 'SHOW_MASCOT'; img: string; msg: string; bounce?: boolean }
   | { type: 'HIDE_MASCOT' }
+  | { type: 'HYDRATE'; user: User | null }
 
 function reducer(state: AppState, action: Action): AppState {
   switch (action.type) {
-    case 'LOGIN':   return { ...state, user: action.user, currentTab: 'quests' }
-    case 'LOGOUT':  return { ...initialState }
+    case 'LOGIN':   return { ...state, user: action.user, currentTab: 'quests', hydrated: true }
+    case 'LOGOUT':  return { ...initialState, hydrated: true }
     case 'SET_TAB': return { ...state, currentTab: action.tab }
     case 'SHOW_TOAST': return { ...state, toast: { msg: action.msg, color: action.color } }
     case 'CLEAR_TOAST': return { ...state, toast: null }
@@ -43,6 +69,7 @@ function reducer(state: AppState, action: Action): AppState {
     case 'CLEAR_XP':   return { ...state, xpPop: null }
     case 'SHOW_MASCOT': return { ...state, mascot: { img: action.img, msg: action.msg, bounce: action.bounce ?? false } }
     case 'HIDE_MASCOT': return { ...state, mascot: null }
+    case 'HYDRATE': return { ...state, user: action.user, hydrated: true }
     default: return state
   }
 }
@@ -64,8 +91,22 @@ const Ctx = createContext<AppCtx | null>(null)
 export function AppProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initialState)
 
-  const login  = useCallback((user: User) => dispatch({ type: 'LOGIN', user }), [])
-  const logout = useCallback(() => dispatch({ type: 'LOGOUT' }), [])
+  // Restore session from localStorage on mount
+  useEffect(() => {
+    const cached = loadSession()
+    dispatch({ type: 'HYDRATE', user: cached })
+  }, [])
+
+  const login  = useCallback((user: User) => {
+    saveSession(user)
+    dispatch({ type: 'LOGIN', user })
+  }, [])
+
+  const logout = useCallback(() => {
+    clearSession()
+    dispatch({ type: 'LOGOUT' })
+  }, [])
+
   const setTab = useCallback((tab: Tab) => dispatch({ type: 'SET_TAB', tab }), [])
 
   const showToast = useCallback((msg: string, color?: string) => {

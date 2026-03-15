@@ -1,7 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // PWA service worker served from /public
-  // No extra plugin needed — sw.js is in /public and registered manually
+  experimental: {
+    optimizeCss: true,
+  },
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  images: {
+    formats: ['image/webp'],
+  },
+  poweredByHeader: false,
 }
 
 module.exports = nextConfig
