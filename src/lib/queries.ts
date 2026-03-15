@@ -32,9 +32,11 @@ export async function getUsersByTeam(teamKey: string): Promise<User[]> {
 }
 
 export async function getEffectivePin(userId: number): Promise<string> {
-  const { data } = await db().from('custom_pins').select('pin').eq('user_id', userId).single()
+  const { data, error } = await db().from('custom_pins').select('pin').eq('user_id', userId).maybeSingle()
+  if (error) throw new Error(`DB custom_pins: ${error.message}`)
   if (data?.pin) return data.pin
-  const { data: u } = await db().from('users').select('pin').eq('id', userId).single()
+  const { data: u, error: e2 } = await db().from('users').select('pin').eq('id', userId).maybeSingle()
+  if (e2) throw new Error(`DB users: ${e2.message}`)
   return u?.pin ?? ''
 }
 
