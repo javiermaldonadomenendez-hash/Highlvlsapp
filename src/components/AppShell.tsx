@@ -3,9 +3,10 @@
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { useApp } from '@/lib/store'
-import { initials, nextFriday } from '@/lib/helpers'
+import { initials, nextSunday23 } from '@/lib/helpers'
 import { LEADER_IDS } from '@/lib/data'
 import { NotifPrompt } from './NotifPrompt'
+import { SettingsSheet } from './SettingsSheet'
 import type { Team } from '@/types'
 
 // ── Skeleton ──────────────────────────────────────────────────
@@ -39,6 +40,7 @@ export function AppShell({ teams }: Props) {
   const [dlText, setDlText] = useState('–')
   const [dlUrgent, setDlUrgent] = useState(false)
   const [dlPct, setDlPct] = useState(100)
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
   const isLeader = user ? LEADER_IDS.includes(user.id) : false
 
@@ -46,13 +48,13 @@ export function AppShell({ teams }: Props) {
   useEffect(() => {
     function update() {
       const now = new Date()
-      const dl = nextFriday()
+      const dl = nextSunday23()
       const diff = dl.getTime() - now.getTime()
       if (diff < 0) { setDlText('Vorbei!'); setDlUrgent(true); return }
       const d = Math.floor(diff / 86400000)
       const h = Math.floor((diff % 86400000) / 3600000)
       const m = Math.floor((diff % 3600000) / 60000)
-      setDlText(`FR 15:00 · ${d ? d + 'T ' : ''}${h}H ${m}M`)
+      setDlText(`SO 23:00 · ${d ? d + 'T ' : ''}${h}H ${m}M`)
       setDlUrgent(diff < 7200000)
       setDlPct(Math.max(0, Math.min(100, (1 - diff / (7 * 86400000)) * 100)))
     }
@@ -94,9 +96,16 @@ export function AppShell({ teams }: Props) {
     <div className="screen active" id="appScreen">
       <div className="app-header">
         <div className="hl-logo">High<span>levels</span></div>
-        <div className="user-chip" onClick={handleLogout}>
-          <span style={{ fontSize: '.76rem', fontWeight: 600, color: 'var(--muted2)' }}>{user.name}</span>
-          <div className="user-av">{initials(user.name)}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <button
+            onClick={() => setSettingsOpen(true)}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', padding: '4px 6px', color: 'var(--muted)', lineHeight: 1 }}
+            aria-label="Einstellungen"
+          >⚙️</button>
+          <div className="user-chip" onClick={handleLogout}>
+            <span style={{ fontSize: '.76rem', fontWeight: 600, color: 'var(--muted2)' }}>{user.name}</span>
+            <div className="user-av">{initials(user.name)}</div>
+          </div>
         </div>
       </div>
 
@@ -133,6 +142,7 @@ export function AppShell({ teams }: Props) {
       </div>
 
       <NotifPrompt />
+      <SettingsSheet open={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </div>
   )
 }

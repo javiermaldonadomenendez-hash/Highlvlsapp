@@ -55,6 +55,19 @@ export function nextFriday(): Date {
   return fr
 }
 
+export function nextSunday23(): Date {
+  const d = new Date()
+  const day = d.getDay() // 0=Sun
+  // days until next Sunday; if today is Sunday but before 23:00 → today, else next Sunday
+  const daysUntilSun = day === 0
+    ? (d.getHours() < 23 ? 0 : 7)
+    : (7 - day)
+  const sun = new Date(d)
+  sun.setDate(d.getDate() + daysUntilSun)
+  sun.setHours(23, 0, 0, 0)
+  return sun
+}
+
 // ============================================================
 // POINTS CALCULATION
 // ============================================================

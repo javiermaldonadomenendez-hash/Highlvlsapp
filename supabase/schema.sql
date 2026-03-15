@@ -134,6 +134,17 @@ alter table custom_pins        enable row level security;
 -- Für die App: Service-Role-Key auf dem Server hat vollen Zugriff.
 -- Anon-Key darf NICHTS lesen (alle Daten werden server-seitig geladen).
 -- Das schützt PINs und Leistungsdaten vor direktem Browser-Zugriff.
+drop policy if exists "No anon read" on users;
+drop policy if exists "No anon read" on quest_completions;
+drop policy if exists "No anon read" on massnahmen;
+drop policy if exists "No anon read" on kpi_entries;
+drop policy if exists "No anon read" on bws_entries;
+drop policy if exists "No anon read" on user_xp;
+drop policy if exists "No anon read" on contacts;
+drop policy if exists "No anon read" on pinboard;
+drop policy if exists "No anon read" on push_subscriptions;
+drop policy if exists "No anon read" on custom_pins;
+
 create policy "No anon read" on users for select using (false);
 create policy "No anon read" on quest_completions for select using (false);
 create policy "No anon read" on massnahmen for select using (false);

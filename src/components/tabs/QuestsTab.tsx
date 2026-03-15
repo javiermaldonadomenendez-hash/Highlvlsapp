@@ -44,6 +44,14 @@ export function QuestsTab() {
     const h = new Date().getHours()
     return h >= 18 ? 'lucastraurig.png' : 'lucassauer.png'
   })()
+
+  const lucasMsg = (() => {
+    if (doneCnt === QUESTS.length) return '🏆 Perfekt! Alle Quests erledigt!'
+    const h = new Date().getHours()
+    const remaining = QUESTS.length - doneCnt
+    if (h >= 18) return `😬 Nur noch ${remaining} Quest${remaining > 1 ? 's' : ''} — schnell!`
+    return `💪 ${remaining} Quest${remaining > 1 ? 's' : ''} übrig — du schaffst das!`
+  })()
   const lvl = Math.floor(xp / 500) + 1
   const xpPct = Math.min((xp % 500) / 5, 100)
   const today = new Date().toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })
@@ -151,14 +159,17 @@ export function QuestsTab() {
         <div className="streak-row">🔥 <span className="streak-val">{streak.count}</span> Tage in Folge</div>
       </div>
 
+      {/* Lucas Duolingo-style */}
+      <div className="lucas-duo">
+        <div className="lucas-duo-figure">
+          <img src={`/emoji/${lucasImg}`} alt="Lucas" className="lucas-duo-img" />
+        </div>
+        <div className="lucas-duo-bubble">
+          <div className="lucas-duo-text">{lucasMsg}</div>
+        </div>
+      </div>
+
       <div className="xp-row">
-        <img
-          src={`/emoji/${lucasImg}`}
-          alt="Lucas"
-          width={40}
-          height={40}
-          style={{ borderRadius: '50%', flexShrink: 0, objectFit: 'cover', transition: 'opacity .4s' }}
-        />
         <div className="xp-label">⚡ Level {lvl} · {xp} XP</div>
         <div className="xp-bar-wrap"><div className="xp-bar-fill" style={{ width:`${xpPct}%` }} /></div>
         <div className="xp-val">{xp % 500} / 500</div>
