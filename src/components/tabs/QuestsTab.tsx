@@ -20,7 +20,7 @@ export function QuestsTab() {
   const [justDone, setJustDone] = useState<string | null>(null)
   const [mnModal, setMnModal] = useState<MnType | null>(null)
   const [mnPerson, setMnPerson] = useState('')
-  const [mnItems, setMnItems] = useState(['', '', ''])
+  const [mnUrsache, setMnUrsache] = useState('')
 
   const load = useCallback(async () => {
     const [comps, xpData] = await Promise.all([
@@ -63,7 +63,7 @@ export function QuestsTab() {
       const ent = existing.find(m => m.type === mnType)
       setMnModal(mnType)
       setMnPerson(ent?.person ?? '')
-      setMnItems([ent?.item1 ?? '', ent?.item2 ?? '', ent?.item3 ?? ''])
+      setMnUrsache(ent?.item1 ?? '')
       return
     }
     const done = !isDone(qid)
@@ -93,24 +93,23 @@ export function QuestsTab() {
 
   async function saveMn() {
     if (!mnModal) return
-    await saveMassnahme(user.id, mnModal, mnPerson, mnItems)
-    const filled = mnItems.filter(x => x.length > 0).length
+    await saveMassnahme(user.id, mnModal, mnPerson, [mnUrsache])
     const qid = `massnahmen_${mnModal}`
     const wasAlreadyDone = isDone(qid)
-    if ((filled >= 3 || (mnPerson && filled >= 1)) && !wasAlreadyDone) {
+    if (mnPerson && mnUrsache && !wasAlreadyDone) {
       const q = QUESTS.find(x => x.id === qid)!
       await toggleQuestAction(user.id, qid, true, q.xp)
       setCompletions(prev => [...prev, { quest_id: qid, day_key: dayKey(), xp_earned: q.xp }])
       setXp(prev => prev + q.xp)
       showXP(`+${q.xp} XP`)
-    } else if (filled === 0 && !mnPerson && wasAlreadyDone) {
+    } else if (!mnPerson && !mnUrsache && wasAlreadyDone) {
       const q = QUESTS.find(x => x.id === qid)!
       await toggleQuestAction(user.id, qid, false, q.xp)
       setCompletions(prev => prev.filter(c => c.quest_id !== qid))
       setXp(prev => Math.max(0, prev - q.xp))
     }
     setMnModal(null)
-    showToast('✅ Maßnahmen gespeichert', 'green')
+    showToast('✅ Maßnahme gespeichert', 'green')
   }
 
   function confettiBurst() {
@@ -125,15 +124,6 @@ export function QuestsTab() {
   }
 
   const mnIsPopa = mnModal === 'popa'
-  const mnPlaceholders = mnIsPopa ? [
-    'z.B. Ich plane mit Max einen Magic Moment und lade ihn zur nächsten Zuführung ein.',
-    'z.B. Ich führe mit Lisa das P1-Gespräch und plane gemeinsam eine Zuführung.',
-    'z.B. Ich vereinbare mit Tom ein Café­gespräch und erkläre ihm das Geschäftsmodell.',
-  ] : [
-    'z.B. Ich bereite mit meinem Buddy den EOA-Termin mit Sarah vor und übe den Pitch.',
-    'z.B. Ich bespreche mit meiner Führungskraft die Strategie für das Gespräch mit Max.',
-    'z.B. Ich schicke Lisa die Unterlagen und vereinbare ein Folgegespräch.',
-  ]
 
   return (
     <div>
@@ -202,23 +192,22 @@ export function QuestsTab() {
               <span>Maßnahmen {mnIsPopa ? 'PoPa' : 'PoKu'}</span>
               <button className="sheet-close" onClick={() => setMnModal(null)}>✕</button>
             </div>
-            <p style={{ fontSize:'.62rem', color:'var(--muted)', marginBottom:11 }}>Vollständige Sätze – was genau planst du?</p>
-            <input className="sheet-input" style={{ marginBottom:12 }}
-              placeholder={mnIsPopa ? 'Name des potentiellen Partners...' : 'Name des potentiellen Kunden...'}
-              value={mnPerson} onChange={e => setMnPerson(e.target.value)} />
-            {[0,1,2].map(i => (
-              <div key={i} style={{ marginBottom:12 }}>
-                <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:5 }}>
-                  <div style={{ width:20, height:20, borderRadius:'50%', background: mnIsPopa ? 'var(--green)' : 'var(--gold)', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:"'Bebas Neue',sans-serif", fontSize:'.82rem', color:'#0d1117', flexShrink:0 }}>{i+1}</div>
-                  <div style={{ fontSize:'.76rem', fontWeight:600 }}>Maßnahme {i+1}</div>
-                  <span style={{ marginLeft:'auto', fontSize:'.57rem', color:'var(--muted)' }}>{mnItems[i].length} / 200</span>
-                </div>
-                <textarea className="sheet-textarea" placeholder={mnPlaceholders[i]} maxLength={200}
-                  value={mnItems[i]} onChange={e => setMnItems(prev => { const n=[...prev]; n[i]=e.target.value; return n })} />
-                <button style={{ background:'none', border:'none', color:'var(--muted)', fontSize:'.6rem', cursor:'pointer', marginTop:2 }}
-                  onClick={() => setMnItems(prev => { const n=[...prev]; n[i]=''; return n })}>↩ Leeren</button>
+            <div style={{ marginBottom:12 }}>
+              <div style={{ fontSize:'.72rem', fontWeight:600, marginBottom:5 }}>Name</div>
+              <input className="sheet-input"
+                placeholder={mnIsPopa ? 'Name des potentiellen Partners...' : 'Name des potentiellen Kunden...'}
+                value={mnPerson} onChange={e => setMnPerson(e.target.value)} />
+            </div>
+            <div style={{ marginBottom:12 }}>
+              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:5 }}>
+                <div style={{ fontSize:'.72rem', fontWeight:600 }}>Ursache / Maßnahme</div>
+                <span style={{ fontSize:'.57rem', color:'var(--muted)' }}>{mnUrsache.length} / 300</span>
               </div>
-            ))}
+              <textarea className="sheet-textarea"
+                placeholder={mnIsPopa ? 'z.B. Interesse am Geschäftsmodell, plant Zuführung...' : 'z.B. Bedarf erkannt, Follow-up vereinbart...'}
+                maxLength={300}
+                value={mnUrsache} onChange={e => setMnUrsache(e.target.value)} />
+            </div>
             <div style={{ display:'flex', gap:6, marginTop:5 }}>
               <button className="sheet-cancel" onClick={() => setMnModal(null)}>Abbrechen</button>
               <button className="sheet-save" onClick={saveMn}>Speichern</button>
