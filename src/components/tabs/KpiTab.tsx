@@ -20,6 +20,7 @@ export function KpiTab({ teams }: Props) {
   const [openKec, setOpenKec] = useState<string | null>(null)
   const [localVals, setLocalVals] = useState<Record<string, string[]>>({})
   const [sliderVals, setSliderVals] = useState<Record<string, number>>({})
+  const [checkedVals, setCheckedVals] = useState<Record<string, boolean[]>>({})
 
   const load = useCallback(async () => {
     const [kpiData, bws] = await Promise.all([getKpiEntries(user.id), getBwsEntry(user.id)])
@@ -214,15 +215,30 @@ export function KpiTab({ teams }: Props) {
                       {Array.from({ length: k.target }).map((_, n) => (
                         <div key={n} className="kec-entry-row">
                           <div style={{ width:17, fontSize:'.6rem', color:'var(--muted)', textAlign:'right', flexShrink:0 }}>{n+1}</div>
-                          <input className={`kec-input ${vals[n]?.trim() ? 'filled' : ''}`} type="text"
+                          <input className={`kec-input ${vals[n]?.trim() ? 'filled' : ''} ${checkedVals[k.id]?.[n] ? 'kec-done' : ''}`} type="text"
                             value={vals[n] ?? ''} placeholder={k.placeholder}
                             onChange={e => {
                               const next = [...vals]; next[n] = e.target.value
                               setLocalVals(prev => ({ ...prev, [k.id]: next }))
                             }} />
                           {vals[n]?.trim() && (
-                            <button style={{ background:'none', border:'none', color:'var(--muted)', fontSize:'.8rem', cursor:'pointer', padding:3, flexShrink:0 }}
-                              onClick={() => setLocalVals(prev => { const next=[...(prev[k.id]||[])]; next[n]=''; return { ...prev, [k.id]: next } })}>🗑</button>
+                            <>
+                              <button
+                                title="Als erledigt markieren"
+                                style={{ background:'none', border:'none', fontSize:'.85rem', cursor:'pointer', padding:3, flexShrink:0, opacity: checkedVals[k.id]?.[n] ? 1 : 0.35 }}
+                                onClick={() => setCheckedVals(prev => {
+                                  const arr = [...(prev[k.id] ?? Array(k.target).fill(false))]
+                                  arr[n] = !arr[n]
+                                  return { ...prev, [k.id]: arr }
+                                })}>
+                                {checkedVals[k.id]?.[n] ? '✅' : '☑️'}
+                              </button>
+                              <button style={{ background:'none', border:'none', color:'var(--muted)', fontSize:'.8rem', cursor:'pointer', padding:3, flexShrink:0 }}
+                                onClick={() => {
+                                  setLocalVals(prev => { const next=[...(prev[k.id]||[])]; next[n]=''; return { ...prev, [k.id]: next } })
+                                  setCheckedVals(prev => { const arr=[...(prev[k.id]??Array(k.target).fill(false))]; arr[n]=false; return { ...prev, [k.id]: arr } })
+                                }}>🗑</button>
+                            </>
                           )}
                         </div>
                       ))}

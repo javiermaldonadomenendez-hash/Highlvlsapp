@@ -4,7 +4,8 @@
 
 export type Role = 'CC' | 'SC' | 'JC' | 'Trainee'
 export type TeamKey = 'kurosch' | 'michael' | 'lucas'
-export type MnType = 'popa' | 'poku'
+export type MnBase = 'popa' | 'poku'
+export type MnType = 'popa_1' | 'popa_2' | 'popa_3' | 'poku_1' | 'poku_2' | 'poku_3'
 export type ContactType = 'popa' | 'poku'
 export type RankPeriod = 'weekly' | 'monthly'
 export type Tab = 'quests' | 'kpi' | 'ranking' | 'contacts' | 'pinboard' | 'leader'

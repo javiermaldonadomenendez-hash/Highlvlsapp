@@ -8,7 +8,7 @@ import {
 } from '@/lib/queries'
 import { dayKey } from '@/lib/helpers'
 import { QUESTS, MN_QUEST_IDS } from '@/lib/data'
-import type { QuestCompletion, MnType } from '@/types'
+import type { QuestCompletion, MnBase, MnType } from '@/types'
 
 export function QuestsTab() {
   const { state, showToast, showXP, showMascot } = useApp()
@@ -18,9 +18,12 @@ export function QuestsTab() {
   const [xp, setXp] = useState(0)
   const [streak, setStreak] = useState({ count: 0 })
   const [justDone, setJustDone] = useState<string | null>(null)
-  const [mnModal, setMnModal] = useState<MnType | null>(null)
-  const [mnPerson, setMnPerson] = useState('')
-  const [mnUrsache, setMnUrsache] = useState('')
+  const [mnModal, setMnModal] = useState<MnBase | null>(null)
+  const [mnEntries, setMnEntries] = useState([
+    { person: '', ursache: '' },
+    { person: '', ursache: '' },
+    { person: '', ursache: '' },
+  ])
 
   const load = useCallback(async () => {
     const [comps, xpData] = await Promise.all([
@@ -58,12 +61,13 @@ export function QuestsTab() {
 
   async function handleToggle(qid: string) {
     if (MN_QUEST_IDS.includes(qid)) {
-      const mnType: MnType = qid === 'massnahmen_popa' ? 'popa' : 'poku'
+      const base: MnBase = qid === 'massnahmen_popa' ? 'popa' : 'poku'
       const existing = await getMassnahmen(user.id)
-      const ent = existing.find(m => m.type === mnType)
-      setMnModal(mnType)
-      setMnPerson(ent?.person ?? '')
-      setMnUrsache(ent?.item1 ?? '')
+      setMnEntries([1, 2, 3].map(i => {
+        const ent = existing.find(m => m.type === `${base}_${i}` as MnType)
+        return { person: ent?.person ?? '', ursache: ent?.item1 ?? '' }
+      }))
+      setMnModal(base)
       return
     }
     const done = !isDone(qid)
@@ -93,23 +97,29 @@ export function QuestsTab() {
 
   async function saveMn() {
     if (!mnModal) return
-    await saveMassnahme(user.id, mnModal, mnPerson, [mnUrsache])
+    await Promise.all(
+      mnEntries.map((e, i) =>
+        saveMassnahme(user.id, `${mnModal}_${i + 1}` as MnType, e.person, [e.ursache])
+      )
+    )
     const qid = `massnahmen_${mnModal}`
     const wasAlreadyDone = isDone(qid)
-    if (mnPerson && mnUrsache && !wasAlreadyDone) {
+    const anyFilled = mnEntries.some(e => e.person && e.ursache)
+    const allEmpty  = mnEntries.every(e => !e.person && !e.ursache)
+    if (anyFilled && !wasAlreadyDone) {
       const q = QUESTS.find(x => x.id === qid)!
       await toggleQuestAction(user.id, qid, true, q.xp)
       setCompletions(prev => [...prev, { quest_id: qid, day_key: dayKey(), xp_earned: q.xp }])
       setXp(prev => prev + q.xp)
       showXP(`+${q.xp} XP`)
-    } else if (!mnPerson && !mnUrsache && wasAlreadyDone) {
+    } else if (allEmpty && wasAlreadyDone) {
       const q = QUESTS.find(x => x.id === qid)!
       await toggleQuestAction(user.id, qid, false, q.xp)
       setCompletions(prev => prev.filter(c => c.quest_id !== qid))
       setXp(prev => Math.max(0, prev - q.xp))
     }
     setMnModal(null)
-    showToast('✅ Maßnahme gespeichert', 'green')
+    showToast('✅ Maßnahmen gespeichert', 'green')
   }
 
   function confettiBurst() {
@@ -192,22 +202,27 @@ export function QuestsTab() {
               <span>Maßnahmen {mnIsPopa ? 'PoPa' : 'PoKu'}</span>
               <button className="sheet-close" onClick={() => setMnModal(null)}>✕</button>
             </div>
-            <div style={{ marginBottom:12 }}>
-              <div style={{ fontSize:'.72rem', fontWeight:600, marginBottom:5 }}>Name</div>
-              <input className="sheet-input"
-                placeholder={mnIsPopa ? 'Name des potentiellen Partners...' : 'Name des potentiellen Kunden...'}
-                value={mnPerson} onChange={e => setMnPerson(e.target.value)} />
-            </div>
-            <div style={{ marginBottom:12 }}>
-              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:5 }}>
-                <div style={{ fontSize:'.72rem', fontWeight:600 }}>Ursache / Maßnahme</div>
-                <span style={{ fontSize:'.57rem', color:'var(--muted)' }}>{mnUrsache.length} / 300</span>
+            {mnEntries.map((entry, i) => (
+              <div key={i} style={{ marginBottom:16, padding:'12px', background:'var(--card)', borderRadius:12, border:'1px solid var(--border2)' }}>
+                <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:10 }}>
+                  <div style={{ width:22, height:22, borderRadius:'50%', background: mnIsPopa ? 'var(--green)' : 'var(--gold)', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:"'Bebas Neue',sans-serif", fontSize:'.85rem', color:'#0d1117', flexShrink:0 }}>{i+1}</div>
+                  <div style={{ fontSize:'.76rem', fontWeight:700 }}>{mnIsPopa ? 'PoPa' : 'Kunde'} {i+1}</div>
+                </div>
+                <input className="sheet-input" style={{ marginBottom:8 }}
+                  placeholder={mnIsPopa ? 'Name des Partners...' : 'Name des Kunden...'}
+                  value={entry.person}
+                  onChange={e => setMnEntries(prev => prev.map((x, j) => j===i ? {...x, person: e.target.value} : x))} />
+                <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:4 }}>
+                  <div style={{ fontSize:'.68rem', fontWeight:600 }}>Maßnahme</div>
+                  <span style={{ fontSize:'.57rem', color:'var(--muted)' }}>{entry.ursache.length} / 200</span>
+                </div>
+                <textarea className="sheet-textarea"
+                  placeholder={mnIsPopa ? 'z.B. Interesse am Geschäftsmodell, plant Zuführung...' : 'z.B. Bedarf erkannt, Follow-up vereinbart...'}
+                  maxLength={200}
+                  value={entry.ursache}
+                  onChange={e => setMnEntries(prev => prev.map((x, j) => j===i ? {...x, ursache: e.target.value} : x))} />
               </div>
-              <textarea className="sheet-textarea"
-                placeholder={mnIsPopa ? 'z.B. Interesse am Geschäftsmodell, plant Zuführung...' : 'z.B. Bedarf erkannt, Follow-up vereinbart...'}
-                maxLength={300}
-                value={mnUrsache} onChange={e => setMnUrsache(e.target.value)} />
-            </div>
+            ))}
             <div style={{ display:'flex', gap:6, marginTop:5 }}>
               <button className="sheet-cancel" onClick={() => setMnModal(null)}>Abbrechen</button>
               <button className="sheet-save" onClick={saveMn}>Speichern</button>
