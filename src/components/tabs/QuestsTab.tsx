@@ -254,7 +254,10 @@ export function QuestsTab() {
               <div key={s.name} className={`skin-card ${isActive ? 'skin-active' : unlocked ? 'skin-unlocked' : 'skin-locked'}`}>
                 {unlocked
                   ? <img src={`/levelup/${s.folder}/${s.prefix}freude.png`} className="skin-card-img" alt={s.name} />
-                  : <div className="skin-card-lock">🔒</div>
+                  : <div className="skin-card-lock-wrap">
+                      <img src={`/levelup/${s.folder}/${s.prefix}freude.png`} className="skin-card-img skin-card-img-blur" alt={s.name} />
+                      <span className="skin-card-lock-icon">🔒</span>
+                    </div>
                 }
                 <div className="skin-card-name">{s.name}</div>
                 <div className="skin-card-lvl">Lv. {s.minLvl}</div>

@@ -165,7 +165,9 @@ body {
 .skin-card.skin-unlocked { border-color: rgba(34,201,122,.3); }
 .skin-card.skin-locked { opacity: .45; }
 .skin-card-img { width: 40px; height: 40px; object-fit: cover; border-radius: 50%; }
-.skin-card-lock { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
+.skin-card-lock-wrap { position: relative; width: 40px; height: 40px; flex-shrink: 0; }
+.skin-card-img-blur { filter: blur(3px) brightness(0.45); }
+.skin-card-lock-icon { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
 .skin-card-name { font-size: .6rem; font-weight: 700; color: var(--text); text-align: center; }
 .skin-card-lvl { font-size: .55rem; color: var(--muted); }
 
