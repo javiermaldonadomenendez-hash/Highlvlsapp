@@ -4,11 +4,53 @@ import { useEffect, useState, useCallback } from 'react'
 import { useApp } from '@/lib/store'
 import {
   getQuestCompletions, toggleQuest as toggleQuestAction,
-  getMassnahmen, saveMassnahme, getUserXp, updateStreak
+  getMassnahmen, saveMassnahme, getUserXp, updateStreak, getWeeklyQuestXp
 } from '@/lib/queries'
 import { dayKey } from '@/lib/helpers'
 import { QUESTS, MN_QUEST_IDS } from '@/lib/data'
 import type { QuestCompletion, MnBase, MnType } from '@/types'
+
+function XpChart({ data }: { data: { week_key: string; xp: number }[] }) {
+  const W = 300, H = 90, PAD = 16
+  const maxXp = Math.max(...data.map(d => d.xp), 1)
+  const pts = data.map((d, i) => ({
+    x: PAD + (i / (data.length - 1)) * (W - PAD * 2),
+    y: PAD + (1 - d.xp / maxXp) * (H - PAD * 2),
+    ...d,
+  }))
+  const polyline = pts.map(p => `${p.x},${p.y}`).join(' ')
+  // Smooth path using catmull-rom
+  const path = pts.reduce((acc, p, i) => {
+    if (i === 0) return `M${p.x},${p.y}`
+    const prev = pts[i - 1]
+    const cpx = (prev.x + p.x) / 2
+    return acc + ` C${cpx},${prev.y} ${cpx},${p.y} ${p.x},${p.y}`
+  }, '')
+  const fillPath = `${path} L${pts[pts.length-1].x},${H} L${pts[0].x},${H} Z`
+
+  return (
+    <div className="xp-chart-wrap">
+      <div className="xp-chart-title">📊 XP Verlauf (Wochen)</div>
+      <svg viewBox={`0 0 ${W} ${H}`} className="xp-chart-svg" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="xpGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#4f8cff" stopOpacity="0.35" />
+            <stop offset="100%" stopColor="#4f8cff" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <path d={fillPath} fill="url(#xpGrad)" />
+        <path d={path} fill="none" stroke="#4f8cff" strokeWidth="2" strokeLinecap="round" />
+        {pts.map((p, i) => (
+          <g key={i}>
+            <circle cx={p.x} cy={p.y} r="4" fill="#4f8cff" />
+            <text x={p.x} y={H - 2} textAnchor="middle" fontSize="7" fill="var(--muted)">{p.week_key.split('-W')[1] ? `W${p.week_key.split('-W')[1]}` : ''}</text>
+            <text x={p.x} y={p.y - 7} textAnchor="middle" fontSize="7.5" fill="#4f8cff" fontWeight="700">{p.xp}</text>
+          </g>
+        ))}
+      </svg>
+    </div>
+  )
+}
 
 export function QuestsTab() {
   const { state, showToast, showXP, showMascot } = useApp()
@@ -17,6 +59,7 @@ export function QuestsTab() {
   const [completions, setCompletions] = useState<QuestCompletion[]>([])
   const [xp, setXp] = useState(0)
   const [streak, setStreak] = useState({ count: 0 })
+  const [weeklyXp, setWeeklyXp] = useState<{ week_key: string; xp: number }[]>([])
   const [justDone, setJustDone] = useState<string | null>(null)
   const [mnModal, setMnModal] = useState<MnBase | null>(null)
   const [mnEntries, setMnEntries] = useState([
@@ -26,13 +69,15 @@ export function QuestsTab() {
   ])
 
   const load = useCallback(async () => {
-    const [comps, xpData] = await Promise.all([
+    const [comps, xpData, weekly] = await Promise.all([
       getQuestCompletions(user.id),
       getUserXp(user.id),
+      getWeeklyQuestXp(user.id),
     ])
     setCompletions(comps)
     setXp(xpData.xp)
     setStreak({ count: xpData.streak_count })
+    setWeeklyXp(weekly)
   }, [user.id])
 
   useEffect(() => { load() }, [load])
@@ -174,6 +219,8 @@ export function QuestsTab() {
         <div className="xp-bar-wrap"><div className="xp-bar-fill" style={{ width:`${xpPct}%` }} /></div>
         <div className="xp-val">{xp % 500} / 500</div>
       </div>
+
+      {weeklyXp.length >= 2 && <XpChart data={weeklyXp} />}
 
       <div className="sec-label">Tagesaufgaben</div>
 

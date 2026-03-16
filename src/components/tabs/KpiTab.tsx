@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useApp } from '@/lib/store'
-import { getKpiEntries, saveKpiEntry, getBwsEntry, saveBwsEntry } from '@/lib/queries'
+import { getKpiEntries, saveKpiEntry, getBwsEntry, saveBwsEntry, addXp } from '@/lib/queries'
 import { weekKey, kwNum, fmtBWS, calcPtsFromEntries } from '@/lib/helpers'
 import { KPIS, SLIDER_KPI_IDS, MAX_PTS } from '@/lib/data'
 import type { KpiEntry, Team } from '@/types'
@@ -20,7 +20,13 @@ export function KpiTab({ teams }: Props) {
   const [openKec, setOpenKec] = useState<string | null>(null)
   const [localVals, setLocalVals] = useState<Record<string, string[]>>({})
   const [sliderVals, setSliderVals] = useState<Record<string, number>>({})
-  const [checkedVals, setCheckedVals] = useState<Record<string, boolean[]>>({})
+
+  // Confirmed items encoded as "✓" prefix in the stored value
+  const isConfirmed = (kpiId: string, n: number) => (localVals[kpiId]?.[n] ?? '').startsWith('✓')
+  const displayVal  = (kpiId: string, n: number) => {
+    const v = localVals[kpiId]?.[n] ?? ''
+    return v.startsWith('✓') ? v.slice(1) : v
+  }
 
   const load = useCallback(async () => {
     const [kpiData, bws] = await Promise.all([getKpiEntries(user.id), getBwsEntry(user.id)])
@@ -70,6 +76,20 @@ export function KpiTab({ teams }: Props) {
       return next
     })
     showToast('💾 Gespeichert', 'green')
+  }
+
+  async function toggleConfirmed(kpiId: string, n: number, xpPerItem: number) {
+    const vals = [...(localVals[kpiId] ?? [])]
+    const confirmed = vals[n]?.startsWith('✓')
+    if (confirmed) {
+      vals[n] = vals[n].slice(1)
+      await addXp(user.id, -xpPerItem)
+    } else {
+      vals[n] = '✓' + (vals[n] ?? '')
+      await addXp(user.id, xpPerItem)
+    }
+    setLocalVals(prev => ({ ...prev, [kpiId]: vals }))
+    await saveKpiEntry(user.id, kpiId, vals)
   }
 
   async function saveAll() {
@@ -215,28 +235,26 @@ export function KpiTab({ teams }: Props) {
                       {Array.from({ length: k.target }).map((_, n) => (
                         <div key={n} className="kec-entry-row">
                           <div style={{ width:17, fontSize:'.6rem', color:'var(--muted)', textAlign:'right', flexShrink:0 }}>{n+1}</div>
-                          <input className={`kec-input ${vals[n]?.trim() ? 'filled' : ''} ${checkedVals[k.id]?.[n] ? 'kec-done' : ''}`} type="text"
-                            value={vals[n] ?? ''} placeholder={k.placeholder}
+                          <input className={`kec-input ${displayVal(k.id, n).trim() ? 'filled' : ''} ${isConfirmed(k.id, n) ? 'kec-done' : ''}`} type="text"
+                            value={displayVal(k.id, n)} placeholder={k.placeholder}
                             onChange={e => {
-                              const next = [...vals]; next[n] = e.target.value
+                              const next = [...vals]
+                              next[n] = isConfirmed(k.id, n) ? '✓' + e.target.value : e.target.value
                               setLocalVals(prev => ({ ...prev, [k.id]: next }))
                             }} />
-                          {vals[n]?.trim() && (
+                          {displayVal(k.id, n).trim() && (
                             <>
                               <button
-                                title="Als erledigt markieren"
-                                style={{ background:'none', border:'none', fontSize:'.85rem', cursor:'pointer', padding:3, flexShrink:0, opacity: checkedVals[k.id]?.[n] ? 1 : 0.35 }}
-                                onClick={() => setCheckedVals(prev => {
-                                  const arr = [...(prev[k.id] ?? Array(k.target).fill(false))]
-                                  arr[n] = !arr[n]
-                                  return { ...prev, [k.id]: arr }
-                                })}>
-                                {checkedVals[k.id]?.[n] ? '✅' : '☑️'}
+                                title="Als erledigt markieren (+XP)"
+                                style={{ background:'none', border:'none', fontSize:'.85rem', cursor:'pointer', padding:3, flexShrink:0, opacity: isConfirmed(k.id, n) ? 1 : 0.35 }}
+                                onClick={() => toggleConfirmed(k.id, n, Math.round(k.pts / k.target))}>
+                                {isConfirmed(k.id, n) ? '✅' : '☑️'}
                               </button>
                               <button style={{ background:'none', border:'none', color:'var(--muted)', fontSize:'.8rem', cursor:'pointer', padding:3, flexShrink:0 }}
                                 onClick={() => {
-                                  setLocalVals(prev => { const next=[...(prev[k.id]||[])]; next[n]=''; return { ...prev, [k.id]: next } })
-                                  setCheckedVals(prev => { const arr=[...(prev[k.id]??Array(k.target).fill(false))]; arr[n]=false; return { ...prev, [k.id]: arr } })
+                                  const next = [...(localVals[k.id] ?? [])]
+                                  next[n] = ''
+                                  setLocalVals(prev => ({ ...prev, [k.id]: next }))
                                 }}>🗑</button>
                             </>
                           )}

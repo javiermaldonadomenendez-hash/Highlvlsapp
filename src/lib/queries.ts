@@ -242,3 +242,28 @@ export async function createUser(user: Omit<User, 'id' | 'active'>): Promise<Use
 export async function deactivateUser(id: number): Promise<void> {
   await db().from('users').update({ active: false }).eq('id', id)
 }
+
+// ── XP HELPERS ────────────────────────────────────────────────
+export async function addXp(userId: number, amount: number): Promise<void> {
+  await db().rpc('increment_xp', { p_user_id: userId, p_amount: amount })
+}
+
+export async function getWeeklyQuestXp(userId: number): Promise<{ week_key: string; xp: number }[]> {
+  const { data, error } = await db()
+    .from('quest_completions').select('day_key,xp_earned').eq('user_id', userId)
+  if (error) throw error
+  const weekly: Record<string, number> = {}
+  for (const row of data ?? []) {
+    // Convert YYYY-M-D to ISO week key YYYY-Wn
+    const parts = row.day_key.split('-').map(Number)
+    const d = new Date(parts[0], parts[1] - 1, parts[2])
+    const y = d.getFullYear()
+    const start = new Date(y, 0, 1)
+    const w = Math.ceil(((d.getTime() - start.getTime()) / 86400000 + start.getDay() + 1) / 7)
+    const wk = `${y}-W${w}`
+    weekly[wk] = (weekly[wk] ?? 0) + (row.xp_earned ?? 0)
+  }
+  return Object.entries(weekly)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([week_key, xp]) => ({ week_key, xp }))
+}
