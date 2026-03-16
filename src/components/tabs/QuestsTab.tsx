@@ -86,11 +86,27 @@ export function QuestsTab() {
   const doneCnt = QUESTS.filter(q => isDone(q.id)).length
   const pct = Math.round((doneCnt / QUESTS.length) * 100)
 
+  const lvl = Math.floor(xp / 500) + 1
+
+  // Skin unlock system
+  const SKINS = [
+    { name: 'Robin',   minLvl: 10, folder: 'lucasrobin',  prefix: 'lucasrobin'  },
+    { name: 'Soldat',  minLvl: 25, folder: 'lucassoldat', prefix: 'lucassoldat' },
+    { name: '007',     minLvl: 40, folder: 'lucas007',    prefix: 'lucas007'    },
+    { name: 'Gold',    minLvl: 60, folder: 'lucasgold',   prefix: 'lucasgold'   },
+  ]
+  const activeSkin = [...SKINS].reverse().find(s => lvl >= s.minLvl)
+
   // Reactive Lucas mascot based on time + quest status
   const lucasImg = (() => {
-    if (doneCnt === QUESTS.length) return 'lucasfreude.png'
+    const allDone = doneCnt === QUESTS.length
     const h = new Date().getHours()
-    return h >= 18 ? 'lucastraurig.png' : 'lucassauer.png'
+    if (activeSkin) {
+      const mood = allDone ? 'freude' : h >= 18 ? 'traurig' : 'boese'
+      return `/levelup/${activeSkin.folder}/${activeSkin.prefix}${mood}.png`
+    }
+    if (allDone) return '/emoji/lucasfreude.png'
+    return h >= 18 ? '/emoji/lucastraurig.png' : '/emoji/lucassauer.png'
   })()
 
   const lucasMsg = (() => {
@@ -100,7 +116,6 @@ export function QuestsTab() {
     if (h >= 18) return `😬 Nur noch ${remaining} Quest${remaining > 1 ? 's' : ''} — schnell!`
     return `💪 ${remaining} Quest${remaining > 1 ? 's' : ''} übrig — du schaffst das!`
   })()
-  const lvl = Math.floor(xp / 500) + 1
   const xpPct = Math.min((xp % 500) / 5, 100)
   const today = new Date().toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })
 
@@ -207,7 +222,7 @@ export function QuestsTab() {
       {/* Lucas Duolingo-style */}
       <div className="lucas-duo">
         <div className="lucas-duo-figure">
-          <img src={`/emoji/${lucasImg}`} alt="Lucas" className="lucas-duo-img" />
+          <img src={lucasImg} alt="Lucas" className="lucas-duo-img" />
         </div>
         <div className="lucas-duo-bubble">
           <div className="lucas-duo-text">{lucasMsg}</div>
@@ -221,6 +236,33 @@ export function QuestsTab() {
       </div>
 
       {weeklyXp.length >= 2 && <XpChart data={weeklyXp} />}
+
+      {/* Skin unlock strip */}
+      <div className="skin-strip">
+        <div className="skin-strip-title">🎭 Lucas Skins</div>
+        <div className="skin-strip-row">
+          {/* Default skin */}
+          <div className={`skin-card ${!activeSkin ? 'skin-active' : 'skin-unlocked'}`}>
+            <img src="/emoji/lucasfreude.png" className="skin-card-img" alt="Lucas" />
+            <div className="skin-card-name">Standard</div>
+            <div className="skin-card-lvl">Lv. 1</div>
+          </div>
+          {SKINS.map(s => {
+            const unlocked = lvl >= s.minLvl
+            const isActive = activeSkin?.name === s.name
+            return (
+              <div key={s.name} className={`skin-card ${isActive ? 'skin-active' : unlocked ? 'skin-unlocked' : 'skin-locked'}`}>
+                {unlocked
+                  ? <img src={`/levelup/${s.folder}/${s.prefix}freude.png`} className="skin-card-img" alt={s.name} />
+                  : <div className="skin-card-lock">🔒</div>
+                }
+                <div className="skin-card-name">{s.name}</div>
+                <div className="skin-card-lvl">Lv. {s.minLvl}</div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
 
       <div className="sec-label">Tagesaufgaben</div>
 

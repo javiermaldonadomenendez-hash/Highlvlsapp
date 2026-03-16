@@ -155,6 +155,20 @@ body {
 .xp-chart-title { font-size: .65rem; font-weight: 700; color: var(--muted); margin-bottom: 6px; letter-spacing: .04em; text-transform: uppercase; }
 .xp-chart-svg { width: 100%; height: 90px; display: block; }
 
+/* ── SKIN STRIP ───────────────────────────────────────────── */
+.skin-strip { background: var(--card); border: 1px solid var(--border2); border-radius: 14px; padding: 10px 12px; margin-bottom: 10px; }
+.skin-strip-title { font-size: .65rem; font-weight: 700; color: var(--muted); margin-bottom: 8px; letter-spacing: .04em; text-transform: uppercase; }
+.skin-strip-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; }
+.skin-strip-row::-webkit-scrollbar { display: none; }
+.skin-card { flex-shrink: 0; width: 64px; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 4px 6px; border-radius: 12px; border: 1.5px solid var(--border2); transition: border-color .2s; }
+.skin-card.skin-active { border-color: var(--accent); background: rgba(79,140,255,.08); }
+.skin-card.skin-unlocked { border-color: rgba(34,201,122,.3); }
+.skin-card.skin-locked { opacity: .45; }
+.skin-card-img { width: 40px; height: 40px; object-fit: cover; border-radius: 50%; }
+.skin-card-lock { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
+.skin-card-name { font-size: .6rem; font-weight: 700; color: var(--text); text-align: center; }
+.skin-card-lvl { font-size: .55rem; color: var(--muted); }
+
 /* ── QUESTS ───────────────────────────────────────────────── */
 .quest-header { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 14px; margin-bottom: 9px; }
 .qh-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.25rem; letter-spacing: .06em; }
