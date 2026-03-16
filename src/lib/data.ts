@@ -29,9 +29,9 @@ export const SLIDER_KPI_IDS = ['tel_5h', 'wuc_30']
 export const QUESTS: Quest[] = [
   { id: 'prozessliste',     name: 'Prozessliste',         desc: 'Tägliche Prozessliste abarbeiten',                xp: 50, icon: '📋' },
   { id: 'potential_planer', name: 'Potential Planer',     desc: 'Potential Planer ausgefüllt und aktualisiert',    xp: 50, icon: '🗺️' },
+  { id: 'bws_tracking',     name: 'BWS Tracking',          desc: 'BWS für diese Woche eingetragen und aktualisiert', xp: 30, icon: '📈' },
   { id: 'massnahmen_popa',  name: '3 Maßnahmen PoPa',     desc: '3 konkrete Maßnahmen für Potentielle Partner',   xp: 75, icon: '🍀' },
   { id: 'massnahmen_poku',  name: '3 Maßnahmen PoKu',     desc: '3 konkrete Maßnahmen für Potentielle Kunden',    xp: 75, icon: '⭐' },
-  { id: 'bws_tracking',     name: 'BWS Tracking',          desc: 'BWS für diese Woche eingetragen und aktualisiert', xp: 30, icon: '📈' },
 ]
 
 export const TOTAL_XP = QUESTS.reduce((s, q) => s + q.xp, 0)

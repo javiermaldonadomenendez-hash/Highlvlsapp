@@ -83,8 +83,8 @@ export function calcPtsFromEntries(entries: KpiEntry[]): number {
       pts += Math.min(val / k.target, 1) * k.pts
     } else {
       const values = entry?.values ?? []
-      const filled = values.filter(v => v && v.trim()).length
-      pts += Math.min(filled / k.target, 1) * k.pts
+      const confirmed = values.filter(v => v && v.startsWith('✓')).length
+      pts += Math.min(confirmed / k.target, 1) * k.pts
     }
   }
   return Math.round(pts * 10) / 10

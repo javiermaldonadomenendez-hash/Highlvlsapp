@@ -204,8 +204,13 @@ export async function deleteContact(id: string): Promise<void> {
 
 // ── PINBOARD ──────────────────────────────────────────────────
 export async function getPinboard(userId: number): Promise<PinboardData> {
-  const { data } = await db().from('pinboard').select('notes,thoughts,tasks').eq('user_id', userId).single()
-  return data ?? { notes: '', thoughts: '', tasks: [] }
+  const { data } = await db().from('pinboard').select('notes,thoughts,tasks,updated_at').eq('user_id', userId).single()
+  if (!data) return { notes: '', thoughts: '', tasks: [] }
+  // Auto-clear if last saved on a previous day
+  const savedDay = data.updated_at ? new Date(data.updated_at).toDateString() : null
+  const today = new Date().toDateString()
+  if (savedDay && savedDay !== today) return { notes: '', thoughts: '', tasks: [] }
+  return { notes: data.notes, thoughts: data.thoughts, tasks: data.tasks }
 }
 
 export async function savePinboard(userId: number, data: PinboardData): Promise<void> {
