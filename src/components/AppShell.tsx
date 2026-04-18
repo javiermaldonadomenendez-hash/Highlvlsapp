@@ -85,7 +85,7 @@ export function AppShell({ teams }: Props) {
     { id: 'quests',   icon: '⚔️',  label: 'Quests' },
     { id: 'kpi',      icon: '🎯',  label: 'KPIs' },
     { id: 'ranking',  icon: '🏆',  label: 'Ranking' },
-    { id: 'contacts', icon: '👥',  label: 'Kontakte' },
+    { id: 'contacts', icon: '🌱',  label: 'Wachstum' },
     { id: 'pinboard', icon: '📌',  label: 'Board' },
     ...(isLeader ? [{ id: 'leader', icon: '👑', label: 'Team' }] : []),
   ] as const
