@@ -28,6 +28,7 @@ const KpiTab      = dynamic(() => import('./tabs/KpiTab').then(m => ({ default: 
 const RankingTab  = dynamic(() => import('./tabs/RankingTab').then(m => ({ default: m.RankingTab })),   { loading: () => <TabSkeleton />, ssr: false })
 const ContactsTab = dynamic(() => import('./tabs/ContactsTab').then(m => ({ default: m.ContactsTab })), { loading: () => <TabSkeleton />, ssr: false })
 const PinboardTab = dynamic(() => import('./tabs/PinboardTab').then(m => ({ default: m.PinboardTab })), { loading: () => <TabSkeleton />, ssr: false })
+const CupTab      = dynamic(() => import('./tabs/CupTab').then(m => ({ default: m.CupTab })),           { loading: () => <TabSkeleton />, ssr: false })
 const LeaderTab   = dynamic(() => import('./tabs/LeaderTab').then(m => ({ default: m.LeaderTab })),     { loading: () => <TabSkeleton />, ssr: false })
 
 interface Props {
@@ -87,6 +88,7 @@ export function AppShell({ teams }: Props) {
     { id: 'ranking',  icon: '🏆',  label: 'Ranking' },
     { id: 'contacts', icon: '🌱',  label: 'Wachstum' },
     { id: 'pinboard', icon: '📌',  label: 'Board' },
+    { id: 'cup',      icon: '🏆',  label: 'Cup' },
     ...(isLeader ? [{ id: 'leader', icon: '👑', label: 'Team' }] : []),
   ] as const
 
@@ -125,6 +127,7 @@ export function AppShell({ teams }: Props) {
         {currentTab === 'ranking'  && <RankingTab teams={teams} />}
         {currentTab === 'contacts' && <ContactsTab />}
         {currentTab === 'pinboard' && <PinboardTab />}
+        {currentTab === 'cup'      && <CupTab />}
         {currentTab === 'leader'   && isLeader && <LeaderTab teams={teams} />}
       </div>
 

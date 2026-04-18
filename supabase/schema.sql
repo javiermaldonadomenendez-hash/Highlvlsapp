@@ -186,8 +186,8 @@ create policy "No anon read" on top_contacts for select using (false);
 -- ============================================================
 insert into teams (key, name, bws_max, bws_challenges, bws_marks) values
 ('kurosch', 'Team Kurosch', 500000,
-  '[{"threshold":75000,"label":"100€ Bonus","badge":"bws-badge","icon":"💰"},{"threshold":150000,"label":"200€ Bonus gesamt","badge":"bws-badge","icon":"💰"},{"threshold":250000,"label":"Diplomat Kugelschreiber","badge":"bws-badge prem","icon":"🖊️"},{"threshold":500000,"label":"Montblanc Kugelschreiber","badge":"bws-badge ultra","icon":"🖊️"}]',
-  '[{"pct":15,"label":"75K"},{"pct":30,"label":"150K"},{"pct":50,"label":"250K"}]'
+  '[{"threshold":250000,"label":"Diplomat Kugelschreiber","badge":"bws-badge prem","icon":"🖊️"},{"threshold":500000,"label":"Montblanc Kugelschreiber","badge":"bws-badge ultra","icon":"🖊️"}]',
+  '[{"pct":50,"label":"250K"}]'
 ),
 ('michael', 'Team Michael', 500000,
   '[{"threshold":250000,"label":"Diplomat Kugelschreiber","badge":"bws-badge prem","icon":"🖊️"},{"threshold":500000,"label":"Montblanc Kugelschreiber","badge":"bws-badge ultra","icon":"🖊️"}]',

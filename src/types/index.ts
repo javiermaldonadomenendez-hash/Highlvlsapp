@@ -7,8 +7,8 @@ export type TeamKey = 'kurosch' | 'michael' | 'lucas'
 export type MnBase = 'popa' | 'poku'
 export type MnType = 'popa_1' | 'popa_2' | 'popa_3' | 'poku_1' | 'poku_2' | 'poku_3'
 export type ContactType = 'popa' | 'poku'
-export type RankPeriod = 'weekly' | 'monthly' | 'cup'
-export type Tab = 'quests' | 'kpi' | 'ranking' | 'contacts' | 'pinboard' | 'leader'
+export type RankPeriod = 'weekly' | 'monthly'
+export type Tab = 'quests' | 'kpi' | 'ranking' | 'contacts' | 'pinboard' | 'cup' | 'leader'
 
 export interface User {
   id: number
