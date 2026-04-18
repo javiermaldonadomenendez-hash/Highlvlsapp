@@ -76,3 +76,27 @@ export const TEAM_GRADIENT: Record<TeamKey, string> = {
   michael: 'linear-gradient(135deg,#f5a623,#f97316)',
   lucas:   'linear-gradient(135deg,#22c97a,#4f8cff)',
 }
+
+// ============================================================
+// SUB-TEAM WETTBEWERB (Team Kurosch intern)
+// ============================================================
+export interface SubTeamDef {
+  name: string
+  emoji: string
+  members: number[]
+}
+
+export const SUB_TEAMS: SubTeamDef[] = [
+  { name: 'Team FG',                  emoji: '⚡', members: [39, 42] },
+  { name: 'Team Mastermind',           emoji: '🧠', members: [16, 41] },
+  { name: 'Team Freelancers',          emoji: '💼', members: [11, 15] },
+  { name: 'Team Schlitz',             emoji: '🎯', members: [44, 9] },
+  { name: 'Team Los Zigarretos',       emoji: '🌿', members: [40, 1] },
+  { name: 'Team Kur Krai',            emoji: '🔥', members: [10, 43] },
+  { name: 'Team Trick Tick und Track', emoji: '🎪', members: [14, 13, 12] },
+]
+
+export const CUP_GOAL = 10
+export const CUP_MAX_PCT = 0.6
+export const CUP_PRIZE = 'Kinogutschein 4K Max Oberhausen'
+export const CUP_MONTH = '2026-5'

@@ -7,7 +7,7 @@ export type TeamKey = 'kurosch' | 'michael' | 'lucas'
 export type MnBase = 'popa' | 'poku'
 export type MnType = 'popa_1' | 'popa_2' | 'popa_3' | 'poku_1' | 'poku_2' | 'poku_3'
 export type ContactType = 'popa' | 'poku'
-export type RankPeriod = 'weekly' | 'monthly'
+export type RankPeriod = 'weekly' | 'monthly' | 'cup'
 export type Tab = 'quests' | 'kpi' | 'ranking' | 'contacts' | 'pinboard' | 'leader'
 
 export interface User {
@@ -120,4 +120,19 @@ export interface PinboardData {
 export interface PushSubscriptionRecord {
   user_id: number
   subscription: PushSubscriptionJSON
+}
+
+export interface SubTeamT1 {
+  user_id: number
+  month_key: string
+  count: number
+}
+
+export interface TopContact {
+  id: string
+  user_id: number
+  type: 'popa' | 'kunde'
+  name: string
+  notes: string
+  created_at: string
 }

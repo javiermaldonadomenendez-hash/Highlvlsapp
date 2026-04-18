@@ -117,6 +117,25 @@ create table if not exists push_subscriptions (
   updated_at   timestamptz default now()
 );
 
+-- SUB-TEAM T1 WETTBEWERB (monatlich, pro User)
+create table if not exists sub_team_t1 (
+  user_id    int  references users(id) on delete cascade,
+  month_key  text not null,
+  count      int  default 0,
+  updated_at timestamptz default now(),
+  primary key (user_id, month_key)
+);
+
+-- TOP-KONTAKTE (Top-PoPa / Top-Kunden pro User)
+create table if not exists top_contacts (
+  id         uuid primary key default gen_random_uuid(),
+  user_id    int  references users(id) on delete cascade,
+  type       text not null,  -- 'popa' | 'kunde'
+  name       text not null,
+  notes      text default '',
+  created_at timestamptz default now()
+);
+
 -- ============================================================
 -- ROW LEVEL SECURITY
 -- ============================================================
@@ -130,6 +149,8 @@ alter table contacts           enable row level security;
 alter table pinboard           enable row level security;
 alter table push_subscriptions enable row level security;
 alter table custom_pins        enable row level security;
+alter table sub_team_t1        enable row level security;
+alter table top_contacts       enable row level security;
 
 -- Für die App: Service-Role-Key auf dem Server hat vollen Zugriff.
 -- Anon-Key darf NICHTS lesen (alle Daten werden server-seitig geladen).
@@ -144,6 +165,8 @@ drop policy if exists "No anon read" on contacts;
 drop policy if exists "No anon read" on pinboard;
 drop policy if exists "No anon read" on push_subscriptions;
 drop policy if exists "No anon read" on custom_pins;
+drop policy if exists "No anon read" on sub_team_t1;
+drop policy if exists "No anon read" on top_contacts;
 
 create policy "No anon read" on users for select using (false);
 create policy "No anon read" on quest_completions for select using (false);
@@ -155,6 +178,8 @@ create policy "No anon read" on contacts for select using (false);
 create policy "No anon read" on pinboard for select using (false);
 create policy "No anon read" on push_subscriptions for select using (false);
 create policy "No anon read" on custom_pins for select using (false);
+create policy "No anon read" on sub_team_t1 for select using (false);
+create policy "No anon read" on top_contacts for select using (false);
 
 -- ============================================================
 -- SEED: TEAMS

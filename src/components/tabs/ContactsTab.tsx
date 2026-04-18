@@ -2,173 +2,269 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useApp } from '@/lib/store'
-import { getContacts, saveContact, updateContact, deleteContact } from '@/lib/queries'
-import { fmtDate } from '@/lib/helpers'
-import { CONTACT_EMOJIS } from '@/lib/data'
-import type { Contact, ContactType } from '@/types'
+import {
+  getTopContacts, getAllTopContacts,
+  saveTopContact, updateTopContact, deleteTopContact,
+  getUsers,
+} from '@/lib/queries'
+import type { TopContact, User } from '@/types'
+
+type ListType = 'popa' | 'kunde'
 
 export function ContactsTab() {
   const { state, showToast } = useApp()
   const user = state.user!
 
-  const [contacts, setContacts] = useState<Contact[]>([])
-  const [filter, setFilter] = useState<'all' | ContactType>('all')
-  const [search, setSearch] = useState('')
+  const [listType, setListType] = useState<ListType>('popa')
+  const [contacts, setContacts] = useState<TopContact[]>([])
+  const [allUsers, setAllUsers] = useState<User[]>([])
   const [formOpen, setFormOpen] = useState(false)
-  const [detailContact, setDetailContact] = useState<Contact | null>(null)
-  const [editId, setEditId] = useState<string | null>(null)
+  const [editItem, setEditItem] = useState<TopContact | null>(null)
+  const [fName, setFName] = useState('')
+  const [fNotes, setFNotes] = useState('')
+  const [fType, setFType] = useState<ListType>('popa')
 
-  // Form state
-  const [fEmoji, setFEmoji] = useState('😀')
-  const [fFirst, setFFirst] = useState('')
-  const [fLast, setFLast]   = useState('')
-  const [fPhone, setFPhone] = useState('')
-  const [fBday, setFBday]   = useState('')
-  const [fBedarf, setFBedarf] = useState('')
-  const [fType, setFType]   = useState<ContactType>('popa')
+  const isLeader = user.is_leader
 
   const load = useCallback(async () => {
-    const data = await getContacts(user.id)
-    setContacts(data)
-  }, [user.id])
+    if (isLeader) {
+      const [data, users] = await Promise.all([getAllTopContacts(), getUsers()])
+      setContacts(data)
+      setAllUsers(users)
+    } else {
+      const data = await getTopContacts(user.id)
+      setContacts(data)
+    }
+  }, [user.id, isLeader])
 
   useEffect(() => { load() }, [load])
 
-  const filtered = contacts.filter(c => {
-    const matchType = filter === 'all' || c.type === filter
-    const q = search.toLowerCase()
-    const matchSearch = !q || `${c.first_name} ${c.last_name}`.toLowerCase().includes(q) || c.phone?.includes(q)
-    return matchType && matchSearch
-  })
+  const filtered = contacts.filter(c => c.type === listType)
 
-  function openForm(c?: Contact) {
-    if (c) {
-      setEditId(c.id); setFEmoji(c.emoji); setFFirst(c.first_name); setFLast(c.last_name)
-      setFPhone(c.phone); setFBday(c.birthday); setFBedarf(c.bedarf); setFType(c.type)
-    } else {
-      setEditId(null); setFEmoji('😀'); setFFirst(''); setFLast('')
-      setFPhone(''); setFBday(''); setFBedarf(''); setFType('popa')
-    }
-    setDetailContact(null)
+  function openAdd() {
+    setEditItem(null)
+    setFName('')
+    setFNotes('')
+    setFType(listType)
+    setFormOpen(true)
+  }
+
+  function openEdit(c: TopContact) {
+    setEditItem(c)
+    setFName(c.name)
+    setFNotes(c.notes)
+    setFType(c.type)
     setFormOpen(true)
   }
 
   async function handleSave() {
-    if (!fFirst.trim()) { showToast('❌ Vorname fehlt'); return }
-    if (editId) {
-      await updateContact(editId, { emoji: fEmoji, first_name: fFirst, last_name: fLast, phone: fPhone, birthday: fBday, bedarf: fBedarf, type: fType })
+    if (!fName.trim()) { showToast('❌ Name fehlt'); return }
+    if (editItem) {
+      await updateTopContact(editItem.id, { name: fName.trim(), notes: fNotes.trim(), type: fType })
       showToast('✅ Gespeichert', 'green')
     } else {
-      await saveContact({ user_id: user.id, emoji: fEmoji, first_name: fFirst, last_name: fLast, phone: fPhone, birthday: fBday, bedarf: fBedarf, type: fType })
-      showToast('✅ Kontakt gespeichert', 'green')
+      await saveTopContact({ user_id: user.id, type: fType, name: fName.trim(), notes: fNotes.trim() })
+      showToast('✅ Eingetragen', 'green')
     }
     setFormOpen(false)
     load()
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Kontakt löschen?')) return
-    await deleteContact(id)
-    setDetailContact(null)
+    if (!confirm('Eintrag löschen?')) return
+    await deleteTopContact(id)
     showToast('🗑 Gelöscht')
     load()
   }
 
-  function exportVCard(c: Contact) {
-    const vcard = `BEGIN:VCARD\nVERSION:3.0\nN:${c.last_name};${c.first_name}\nFN:${c.first_name} ${c.last_name}\nTEL:${c.phone}\nNOTE:${c.bedarf}\nEND:VCARD`
-    const a = document.createElement('a')
-    a.href = 'data:text/vcard;charset=utf-8,' + encodeURIComponent(vcard)
-    a.download = `${c.first_name}_${c.last_name}.vcf`
-    a.click()
+  function getUserName(uid: number) {
+    const u = allUsers.find(x => x.id === uid)
+    return u?.name ?? `#${uid}`
   }
+
+  const typeLabel = listType === 'popa' ? '🌿 Top-PoPa' : '⭐ Top-Kunden'
 
   return (
     <div>
-      <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:7 }}>
-        <input className="ct-search" placeholder="🔍 Suchen..." value={search} onChange={e => setSearch(e.target.value)} />
-        <button className="ct-add-fab" onClick={() => openForm()}>＋</button>
+      {/* Switcher */}
+      <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
+        <button
+          onClick={() => setListType('popa')}
+          style={{
+            flex: 1,
+            padding: '9px 0',
+            borderRadius: 12,
+            border: listType === 'popa' ? 'none' : '1px solid var(--border)',
+            background: listType === 'popa' ? 'linear-gradient(135deg,#22c97a,#4f8cff)' : 'var(--card)',
+            color: listType === 'popa' ? '#fff' : 'var(--muted)',
+            fontFamily: "'DM Sans',sans-serif",
+            fontSize: '.68rem',
+            fontWeight: 700,
+            cursor: 'pointer',
+          }}
+        >
+          🌿 Top-PoPa
+        </button>
+        <button
+          onClick={() => setListType('kunde')}
+          style={{
+            flex: 1,
+            padding: '9px 0',
+            borderRadius: 12,
+            border: listType === 'kunde' ? 'none' : '1px solid var(--border)',
+            background: listType === 'kunde' ? 'linear-gradient(135deg,#f5a623,#f97316)' : 'var(--card)',
+            color: listType === 'kunde' ? '#fff' : 'var(--muted)',
+            fontFamily: "'DM Sans',sans-serif",
+            fontSize: '.68rem',
+            fontWeight: 700,
+            cursor: 'pointer',
+          }}
+        >
+          ⭐ Top-Kunden
+        </button>
       </div>
 
-      <div style={{ display:'flex', gap:5, marginBottom:8 }}>
-        {(['all','popa','poku'] as const).map(f => (
-          <button key={f} className={`ct-filter ${filter === f ? 'active' : ''}`} onClick={() => setFilter(f)}>
-            {f === 'all' ? 'Alle' : f === 'popa' ? '🌿 PoPa' : '⭐ PoKu'}
-          </button>
-        ))}
-      </div>
-
-      {filtered.length === 0 && (
-        <div style={{ textAlign:'center', padding:'32px 0', color:'var(--muted)', fontSize:'.74rem' }}>
-          Noch keine Kontakte{search ? ' gefunden' : ''}.<br />
-          <button style={{ marginTop:10, background:'var(--accent)', border:'none', borderRadius:10, padding:'8px 16px', color:'#fff', fontSize:'.72rem', fontWeight:700, cursor:'pointer' }} onClick={() => openForm()}>+ Erster Kontakt</button>
+      {/* Leader note */}
+      {isLeader && (
+        <div style={{ fontSize: '.6rem', color: 'var(--muted)', marginBottom: 8, textAlign: 'center' }}>
+          👑 Du siehst alle Einträge des Teams
         </div>
       )}
 
-      {filtered.map(c => (
-        <div key={c.id} className="ct-card" onClick={() => setDetailContact(c)}>
-          <div className={`ct-av ${c.type}`}>{c.emoji}</div>
-          <div className="ct-info">
-            <div className="ct-name">{c.first_name} {c.last_name}</div>
-            <div className="ct-detail">{c.phone}{c.birthday ? ` · 🎂 ${fmtDate(c.birthday)}` : ''}</div>
-          </div>
-          <span className={`ct-type ${c.type}`}>{c.type === 'popa' ? 'PoPa' : 'PoKu'}</span>
-        </div>
-      ))}
+      {/* Add button */}
+      <button
+        onClick={openAdd}
+        style={{
+          width: '100%',
+          padding: '10px',
+          borderRadius: 12,
+          border: '1.5px dashed var(--border)',
+          background: 'transparent',
+          color: 'var(--muted)',
+          fontFamily: "'DM Sans',sans-serif",
+          fontSize: '.7rem',
+          fontWeight: 600,
+          cursor: 'pointer',
+          marginBottom: 10,
+        }}
+      >
+        + {listType === 'popa' ? 'PoPa eintragen' : 'Kunden eintragen'}
+      </button>
 
-      {/* Contact detail sheet */}
-      {detailContact && (
-        <div className="overlay open" onClick={() => setDetailContact(null)}>
-          <div className="sheet" onClick={e => e.stopPropagation()}>
-            <div className="sheet-handle" />
-            <div style={{ display:'flex', gap:11, alignItems:'center', marginBottom:13 }}>
-              <div style={{ width:48, height:48, borderRadius:'50%', background:'var(--accent)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.1rem', color:'#fff', flexShrink:0 }}>{detailContact.emoji}</div>
-              <div>
-                <div style={{ fontSize:'.95rem', fontWeight:700 }}>{detailContact.first_name} {detailContact.last_name}</div>
-                <div style={{ fontSize:'.61rem', color:'var(--muted)', marginTop:3 }}>{detailContact.phone}{detailContact.birthday ? ` · 🎂 ${fmtDate(detailContact.birthday)}` : ''}</div>
+      {/* List */}
+      {filtered.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: '32px 0', color: 'var(--muted)', fontSize: '.74rem' }}>
+          Noch keine Einträge in der {typeLabel}-Liste.
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+          {filtered.map(c => (
+            <div
+              key={c.id}
+              style={{
+                background: 'var(--card)',
+                border: '1px solid var(--border)',
+                borderRadius: 13,
+                padding: '11px 13px',
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 10,
+              }}
+            >
+              <div style={{
+                width: 36,
+                height: 36,
+                borderRadius: '50%',
+                background: listType === 'popa'
+                  ? 'linear-gradient(135deg,#22c97a,#4f8cff)'
+                  : 'linear-gradient(135deg,#f5a623,#f97316)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '.75rem',
+                color: '#fff',
+                fontWeight: 800,
+                flexShrink: 0,
+              }}>
+                {c.name.charAt(0).toUpperCase()}
               </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: '.78rem', fontWeight: 700, color: 'var(--text)', marginBottom: 2 }}>{c.name}</div>
+                {c.notes && (
+                  <div style={{ fontSize: '.65rem', color: 'var(--muted2)', lineHeight: 1.4, marginBottom: 4 }}>{c.notes}</div>
+                )}
+                {isLeader && c.user_id !== user.id && (
+                  <div style={{ fontSize: '.58rem', color: 'var(--muted)', fontStyle: 'italic' }}>
+                    von {getUserName(c.user_id)}
+                  </div>
+                )}
+              </div>
+              {(c.user_id === user.id || isLeader) && (
+                <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
+                  {c.user_id === user.id && (
+                    <button
+                      onClick={() => openEdit(c)}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '.85rem', padding: '2px 4px', color: 'var(--muted)' }}
+                    >✏️</button>
+                  )}
+                  {(c.user_id === user.id || isLeader) && (
+                    <button
+                      onClick={() => handleDelete(c.id)}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '.85rem', padding: '2px 4px', color: 'var(--red)' }}
+                    >🗑</button>
+                  )}
+                </div>
+              )}
             </div>
-            {detailContact.bedarf && (
-              <div style={{ fontSize:'.68rem', color:'var(--muted2)', background:'var(--card)', borderRadius:10, padding:'10px 12px', marginBottom:13, lineHeight:1.5 }}>{detailContact.bedarf}</div>
-            )}
-            <div style={{ display:'flex', gap:6 }}>
-              <button style={{ flex:1, background:'var(--card)', border:'1px solid var(--border)', borderRadius:9, padding:8, fontFamily:"'DM Sans',sans-serif", fontSize:'.68rem', fontWeight:600, color:'var(--text)', cursor:'pointer', textAlign:'center' }} onClick={() => exportVCard(detailContact)}>📁 vCard</button>
-              <button style={{ flex:1, background:'var(--card)', border:'1px solid var(--border)', borderRadius:9, padding:8, fontFamily:"'DM Sans',sans-serif", fontSize:'.68rem', fontWeight:600, color:'var(--text)', cursor:'pointer', textAlign:'center' }} onClick={() => openForm(detailContact)}>✏️ Bearbeiten</button>
-              <button style={{ flex:1, background:'var(--card)', border:'1px solid rgba(255,79,79,.2)', borderRadius:9, padding:8, fontFamily:"'DM Sans',sans-serif", fontSize:'.68rem', fontWeight:600, color:'var(--red)', cursor:'pointer', textAlign:'center' }} onClick={() => handleDelete(detailContact.id)}>🗑 Löschen</button>
-            </div>
-          </div>
+          ))}
         </div>
       )}
 
-      {/* Contact form sheet */}
+      {/* Form sheet */}
       {formOpen && (
         <div className="overlay open" onClick={() => setFormOpen(false)}>
           <div className="sheet" onClick={e => e.stopPropagation()}>
             <div className="sheet-handle" />
             <div className="sheet-title">
-              {editId ? '✏️ Kontakt bearbeiten' : '+ Neuer Kontakt'}
+              {editItem ? '✏️ Bearbeiten' : '+ Neuer Eintrag'}
               <button className="sheet-close" onClick={() => setFormOpen(false)}>✕</button>
             </div>
-            <div className="sheet-field">
-              <label>Emoji</label>
-              <div className="emoji-row" style={{ display:'flex', flexWrap:'wrap', gap:5, marginTop:4 }}>
-                {CONTACT_EMOJIS.map(e => (
-                  <div key={e} className={`emoji-opt ${fEmoji === e ? 'sel' : ''}`} onClick={() => setFEmoji(e)}>{e}</div>
-                ))}
-              </div>
-            </div>
-            <div className="sheet-field"><label>Vorname</label><input className="sheet-input" value={fFirst} onChange={e => setFFirst(e.target.value)} placeholder="Max" /></div>
-            <div className="sheet-field"><label>Nachname</label><input className="sheet-input" value={fLast} onChange={e => setFLast(e.target.value)} placeholder="Mustermann" /></div>
-            <div className="sheet-field"><label>Telefon</label><input className="sheet-input" type="tel" value={fPhone} onChange={e => setFPhone(e.target.value)} placeholder="+49..." /></div>
-            <div className="sheet-field"><label>Geburtstag</label><input className="sheet-input" type="date" value={fBday} onChange={e => setFBday(e.target.value)} /></div>
-            <div className="sheet-field"><label>Bedarf / Notiz</label><textarea className="sheet-textarea" value={fBedarf} onChange={e => setFBedarf(e.target.value)} placeholder="z.B. Altersvorsorge, BU..." /></div>
+
             <div className="sheet-field">
               <label>Typ</label>
-              <div style={{ display:'flex', gap:6 }}>
-                <button className={`type-btn popa ${fType === 'popa' ? 'active' : ''}`} onClick={() => setFType('popa')}>🌿 PoPa</button>
-                <button className={`type-btn poku ${fType === 'poku' ? 'active' : ''}`} onClick={() => setFType('poku')}>⭐ PoKu</button>
+              <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
+                <button
+                  className={`type-btn popa ${fType === 'popa' ? 'active' : ''}`}
+                  onClick={() => setFType('popa')}
+                >🌿 PoPa</button>
+                <button
+                  className={`type-btn poku ${fType === 'kunde' ? 'active' : ''}`}
+                  onClick={() => setFType('kunde')}
+                >⭐ Kunde</button>
               </div>
             </div>
-            <div style={{ display:'flex', gap:6, marginTop:5 }}>
+
+            <div className="sheet-field">
+              <label>Name</label>
+              <input
+                className="sheet-input"
+                value={fName}
+                onChange={e => setFName(e.target.value)}
+                placeholder="Vor- und Nachname"
+              />
+            </div>
+
+            <div className="sheet-field">
+              <label>Notiz / Status</label>
+              <textarea
+                className="sheet-textarea"
+                value={fNotes}
+                onChange={e => setFNotes(e.target.value)}
+                placeholder="z.B. Termin vereinbart, Follow-up nötig..."
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: 6, marginTop: 5 }}>
               <button className="sheet-cancel" onClick={() => setFormOpen(false)}>Abbrechen</button>
               <button className="sheet-save" onClick={handleSave}>Speichern</button>
             </div>

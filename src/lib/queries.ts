@@ -5,7 +5,8 @@ import { dayKey, monthKey, weekKey } from './helpers'
 import { sendPushToSubs } from './push'
 import type {
   User, Team, QuestCompletion, Massnahme, KpiEntry,
-  BwsEntry, UserXp, Contact, PinboardData, PushSubscriptionRecord, MnType
+  BwsEntry, UserXp, Contact, PinboardData, PushSubscriptionRecord, MnType,
+  SubTeamT1, TopContact
 } from '@/types'
 
 function db() { return supabaseAdmin() }
@@ -248,6 +249,18 @@ export async function deactivateUser(id: number): Promise<void> {
   await db().from('users').update({ active: false }).eq('id', id)
 }
 
+// Returns user_ids who have completed ALL quests today
+export async function getUsersWithAllQuestsDoneToday(totalQuests: number): Promise<number[]> {
+  const { data, error } = await db()
+    .from('quest_completions').select('user_id').eq('day_key', dayKey())
+  if (error) throw error
+  const counts: Record<number, number> = {}
+  for (const row of data ?? []) counts[row.user_id] = (counts[row.user_id] ?? 0) + 1
+  return Object.entries(counts)
+    .filter(([, cnt]) => cnt >= totalQuests)
+    .map(([uid]) => Number(uid))
+}
+
 // ── XP HELPERS ────────────────────────────────────────────────
 export async function addXp(userId: number, amount: number): Promise<void> {
   await db().rpc('increment_xp', { p_user_id: userId, p_amount: amount })
@@ -271,4 +284,48 @@ export async function getWeeklyQuestXp(userId: number): Promise<{ week_key: stri
   return Object.entries(weekly)
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([week_key, xp]) => ({ week_key, xp }))
+}
+
+// ── SUB-TEAM T1 WETTBEWERB ────────────────────────────────────
+export async function getSubTeamT1ThisMonth(): Promise<SubTeamT1[]> {
+  const { data, error } = await db()
+    .from('sub_team_t1').select('user_id,month_key,count').eq('month_key', monthKey())
+  if (error) throw error
+  return (data ?? []) as SubTeamT1[]
+}
+
+export async function saveSubTeamT1(userId: number, count: number): Promise<void> {
+  await db().from('sub_team_t1').upsert({
+    user_id: userId, month_key: monthKey(), count,
+    updated_at: new Date().toISOString()
+  }, { onConflict: 'user_id,month_key' })
+}
+
+// ── TOP-KONTAKTE ──────────────────────────────────────────────
+export async function getTopContacts(userId: number): Promise<TopContact[]> {
+  const { data, error } = await db()
+    .from('top_contacts').select('id,user_id,type,name,notes,created_at')
+    .eq('user_id', userId).order('created_at')
+  if (error) throw error
+  return (data ?? []) as TopContact[]
+}
+
+export async function getAllTopContacts(): Promise<TopContact[]> {
+  const { data, error } = await db()
+    .from('top_contacts').select('id,user_id,type,name,notes,created_at')
+    .order('user_id').order('type').order('created_at')
+  if (error) throw error
+  return (data ?? []) as TopContact[]
+}
+
+export async function saveTopContact(contact: Omit<TopContact, 'id' | 'created_at'>): Promise<void> {
+  await db().from('top_contacts').insert(contact)
+}
+
+export async function updateTopContact(id: string, updates: Partial<Pick<TopContact, 'name' | 'notes' | 'type'>>): Promise<void> {
+  await db().from('top_contacts').update(updates).eq('id', id)
+}
+
+export async function deleteTopContact(id: string): Promise<void> {
+  await db().from('top_contacts').delete().eq('id', id)
 }
